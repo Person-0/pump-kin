@@ -1,6 +1,7 @@
 // Game Config
-const CELL_SIZE     =  50;
-const INPUT_RATE_ms = 100;
+const WINDOW_SIZE   =   1.25;
+const CELL_SIZE     =   50;
+const INPUT_RATE_ms =   100;
 
 // Canvas setup
 const canvas = document.getElementById("game");
@@ -9,8 +10,8 @@ const ctx = canvas.getContext("2d");
 let cellCenterOffsetX;
 let cellCenterOffsetY;
 const onResize = () => {
-    canvas.width = Math.floor(window.innerWidth / 1.25);
-    canvas.height = Math.floor(window.innerHeight / 1.25);
+    canvas.width = Math.floor(window.innerWidth / WINDOW_SIZE);
+    canvas.height = Math.floor(window.innerHeight / WINDOW_SIZE);
     cellCenterOffsetX = Math.floor((canvas.width / 2) / CELL_SIZE);
     cellCenterOffsetY = Math.floor((canvas.height / 2) / CELL_SIZE);
     console.log("Resize called:");
@@ -44,6 +45,7 @@ const keyEventHandler = (eventName) => {
 canvas.addEventListener("keydown", keyEventHandler("keydown"));
 canvas.addEventListener("keyup", keyEventHandler("keyup"));
 
+// TODO: make this stack based which is read every input process instead of only read on input process
 const readInputs = () => {
     if (pressed_keys["w"]) {
         camY += CELL_SIZE;
@@ -94,8 +96,11 @@ let lastFrame = Date.now();
             ctx.strokeStyle = "rgba(255,255,255,0.1)";
             ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
 
+            // cell coordinates calculations
             const cellX = Math.floor(((x - camX) / CELL_SIZE) - cellCenterOffsetX);
             const cellY = Math.floor(((y - camY) / CELL_SIZE)  - cellCenterOffsetY);
+
+            // draw coordinates on the cells (TODO: add this under debugging flag)
             ctx.font = "15px monospace"; 
             ctx.fillStyle = "red";
             ctx.fillText(cellX, x + camEffX + 20, y + camEffY + 20);
