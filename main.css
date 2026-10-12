@@ -8,6 +8,8 @@ body {
     top: 0;
     margin: auto;
     background-color: black;
+    width: 100%;
+    height: 100%;
 }
 
 #game {
