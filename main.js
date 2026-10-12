@@ -94,6 +94,14 @@ let lastFrame = Date.now();
             ctx.strokeStyle = "rgba(255,255,255,0.1)";
             ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
 
+            const cellX = Math.floor(((x - camX) / CELL_SIZE) - cellCenterOffsetX);
+            const cellY = Math.floor(((y - camY) / CELL_SIZE)  - cellCenterOffsetY);
+            ctx.font = "15px monospace"; 
+            ctx.fillStyle = "red";
+            ctx.fillText(cellX, x + camEffX + 20, y + camEffY + 20);
+            ctx.fillStyle = "lime";
+            ctx.fillText(cellY, x + camEffX + 20, y + camEffY + 40);
+
             // draw player at center
             ctx.fillStyle = "red";
             ctx.fillRect(
