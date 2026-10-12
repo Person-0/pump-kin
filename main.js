@@ -1,6 +1,8 @@
+// Game Config
 const CELL_SIZE     =  50;
 const INPUT_RATE_ms = 100;
 
+// Canvas setup
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -18,7 +20,6 @@ onResize();
 window.onresize = onResize;
 
 // Inputs
-
 const pressed_keys = {};
 
 const keyEventHandler = (eventName) => {
@@ -59,13 +60,11 @@ const readInputs = () => {
 
 
 // Player state
-
 let playerX = 0;
 let playerY = 0;
 let lastInputTime = 0;
 
 // Main game loop
-
 let lastFrame = Date.now();
 (function animate() {
     const now = Date.now();
