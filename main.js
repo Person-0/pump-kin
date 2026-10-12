@@ -1,11 +1,11 @@
-const CELL_SIZE = 50;
+const CELL_SIZE     =  50;
+const INPUT_RATE_ms = 100;
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 let cellCenterOffsetX;
 let cellCenterOffsetY;
-
 const onResize = () => {
     canvas.width = Math.floor(window.innerWidth / 1.25);
     canvas.height = Math.floor(window.innerHeight / 1.25);
@@ -17,16 +17,65 @@ const onResize = () => {
 onResize();
 window.onresize = onResize;
 
+// Inputs
+
+const pressed_keys = {};
+
+const keyEventHandler = (eventName) => {
+    return (e) => {
+        let key = e.key.toLowerCase();
+        if (!key.length) return;
+        if (key === " ") {
+            key = "space";
+        }
+        switch(eventName) {
+            case "keydown":
+                pressed_keys[key] = 1;
+                break;
+            case "keyup":
+                if (pressed_keys[key]) delete pressed_keys[key];
+                break;
+        }
+    }
+}
+
+canvas.addEventListener("keydown", keyEventHandler("keydown"));
+canvas.addEventListener("keyup", keyEventHandler("keyup"));
+
+const readInputs = () => {
+    if (pressed_keys["w"]) {
+        playerY -= 1;
+    }
+    if (pressed_keys["s"]) {
+        playerY += 1;
+    }
+    if (pressed_keys["d"]) {
+        playerX += 1;
+    }
+    if (pressed_keys["a"]) {
+        playerX -= 1;
+    }
+}
+
+
+// Player state
+
 let playerX = 0;
 let playerY = 0;
+let lastInputTime = 0;
 
-// main game loop
+// Main game loop
+
 let lastFrame = Date.now();
 (function animate() {
-
     const now = Date.now();
     const delta = now - lastFrame;
     lastFrame = now;
+
+    if (now-lastInputTime >= INPUT_RATE_ms) {
+        readInputs();
+        lastInputTime = now;
+    }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
