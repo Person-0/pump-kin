@@ -13,6 +13,7 @@ const onResize = () => {
     canvas.height = Math.floor(window.innerHeight / 1.25);
     cellCenterOffsetX = Math.floor((canvas.width / 2) / CELL_SIZE);
     cellCenterOffsetY = Math.floor((canvas.height / 2) / CELL_SIZE);
+    console.log("Resize called:");
     console.log("Canvas: ", canvas.width, canvas.height, "Center:", cellCenterOffsetX, cellCenterOffsetY);
 }
 
@@ -45,23 +46,30 @@ canvas.addEventListener("keyup", keyEventHandler("keyup"));
 
 const readInputs = () => {
     if (pressed_keys["w"]) {
-        playerY -= 1;
+        camY += CELL_SIZE;
+        camEffY -= CELL_SIZE;
     }
     if (pressed_keys["s"]) {
-        playerY += 1;
+        camY -= CELL_SIZE;
+        camEffY += CELL_SIZE;
     }
     if (pressed_keys["d"]) {
-        playerX += 1;
+        camX -= CELL_SIZE;
+        camEffX += CELL_SIZE;
     }
     if (pressed_keys["a"]) {
-        playerX -= 1;
+        camX += CELL_SIZE;
+        camEffX -= CELL_SIZE;
     }
 }
 
+// Camera state
+let camX = 0; // actual cam vales
+let camY = 0;
+let camEffX = 0; // values used in lerp for chase anim
+let camEffY = 0;
 
 // Player state
-let playerX = 0;
-let playerY = 0;
 let lastInputTime = 0;
 
 // Main game loop
@@ -84,19 +92,27 @@ let lastFrame = Date.now();
             // this just draws a semi-transparent matrix
             // might remove later if looks better without it
             ctx.strokeStyle = "rgba(255,255,255,0.1)";
-            ctx.strokeRect(x, y, CELL_SIZE, CELL_SIZE);
+            ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
 
-            // calculates the actual x,y coords of the cell according to the cell size
-            const cellX = Math.floor(x/CELL_SIZE) - cellCenterOffsetX;
-            const cellY = Math.floor(y/CELL_SIZE) - cellCenterOffsetY;
-
-            if (cellX === playerX && cellY === playerY) {
-                ctx.fillStyle = "red";
-                ctx.fillRect(x, y, CELL_SIZE, CELL_SIZE);
-            }
+            // draw player at center
+            ctx.fillStyle = "red";
+            ctx.fillRect(
+                (cellCenterOffsetX * CELL_SIZE) + camEffX,
+                (cellCenterOffsetY * CELL_SIZE) + camEffY,
+                CELL_SIZE, CELL_SIZE
+            );
 
         }
     }
 
+    camEffX = lerp(camEffX, 0, 0.0025 * delta);
+    camEffY = lerp(camEffY, 0, 0.0025 * delta);
+
     requestAnimationFrame(animate);
 })();
+
+// Utils
+
+function lerp(a, b, t) {
+    return a + (b - a)*t;
+}
