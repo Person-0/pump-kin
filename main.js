@@ -22,7 +22,7 @@ onResize();
 window.onresize = onResize;
 
 // Inputs
-const pressed_keys = {};
+const key_stack = [];
 
 const keyEventHandler = (eventName) => {
     return (e) => {
@@ -31,12 +31,15 @@ const keyEventHandler = (eventName) => {
         if (key === " ") {
             key = "space";
         }
+        const index = key_stack.indexOf(key);
         switch(eventName) {
             case "keydown":
-                pressed_keys[key] = 1;
+                if (index === -1) key_stack.push(key);
                 break;
             case "keyup":
-                if (pressed_keys[key]) delete pressed_keys[key];
+                if (index > -1) {
+                    //key_stack.splice(index, 1);
+                }
                 break;
         }
     }
@@ -45,23 +48,27 @@ const keyEventHandler = (eventName) => {
 canvas.addEventListener("keydown", keyEventHandler("keydown"));
 canvas.addEventListener("keyup", keyEventHandler("keyup"));
 
-// TODO: make this stack based which is read every input process instead of only read on input process
 const readInputs = () => {
-    if (pressed_keys["w"]) {
-        camY += CELL_SIZE;
-        camEffY -= CELL_SIZE;
-    }
-    if (pressed_keys["s"]) {
-        camY -= CELL_SIZE;
-        camEffY += CELL_SIZE;
-    }
-    if (pressed_keys["d"]) {
-        camX -= CELL_SIZE;
-        camEffX += CELL_SIZE;
-    }
-    if (pressed_keys["a"]) {
-        camX += CELL_SIZE;
-        camEffX -= CELL_SIZE;
+    while(key_stack.length > 0) {
+        const key = key_stack.shift();
+        switch(key) {
+            case "w":
+                camY += CELL_SIZE;
+                camEffY -= CELL_SIZE;
+                break;
+            case "s":
+                camY -= CELL_SIZE;
+                camEffY += CELL_SIZE;
+                break;
+            case "d":
+                camX -= CELL_SIZE;
+                camEffX += CELL_SIZE;
+                break;
+            case "a":
+                camX += CELL_SIZE;
+                camEffX -= CELL_SIZE;
+                break;
+        }
     }
 }
 
