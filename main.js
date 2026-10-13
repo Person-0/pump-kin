@@ -2,6 +2,7 @@
 const WINDOW_SIZE   =   1.25;
 const CELL_SIZE     =   50;
 const INPUT_RATE_ms =   100;
+let _isDebugging    =   true;
 
 // Canvas setup
 const canvas = document.getElementById("game");
@@ -45,7 +46,6 @@ const keyEventHandler = (eventName) => {
 canvas.addEventListener("keydown", keyEventHandler("keydown"));
 canvas.addEventListener("keyup", keyEventHandler("keyup"));
 
-// TODO: make this stack based which is read every input process instead of only read on input process
 const readInputs = () => {
     if (pressed_keys["w"]) {
         camY += CELL_SIZE;
@@ -100,12 +100,14 @@ let lastFrame = Date.now();
             const cellX = Math.floor(((x - camX) / CELL_SIZE) - cellCenterOffsetX);
             const cellY = Math.floor(((y - camY) / CELL_SIZE)  - cellCenterOffsetY);
 
-            // draw coordinates on the cells (TODO: add this under debugging flag)
-            ctx.font = "15px monospace"; 
-            ctx.fillStyle = "red";
-            ctx.fillText(cellX, x + camEffX + 20, y + camEffY + 20);
-            ctx.fillStyle = "lime";
-            ctx.fillText(cellY, x + camEffX + 20, y + camEffY + 40);
+            if (_isDebugging) {
+                // draw coordinates on the cells
+                ctx.font = "15px monospace"; 
+                ctx.fillStyle = "red";
+                ctx.fillText(cellX, x + camEffX + 20, y + camEffY + 20);
+                ctx.fillStyle = "lime";
+                ctx.fillText(cellY, x + camEffX + 20, y + camEffY + 40);
+            }
 
             // draw player at center
             ctx.fillStyle = "red";
