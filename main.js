@@ -12,30 +12,9 @@ const generate_maze = (width, height) => {
         let row = new Array(width).fill(0);
         generated_maze[y] = row;
         for(let x = 0; x < width; x++) {
-            let curCellIndex = cellIndex;
-            let forcedCellIndex = false;
-            if (y > 0 && Math.random() >= 0.5) { // connect top?
-                curCellIndex = generated_maze[y-1][x][0];
-                forcedCellIndex = true;
-            }
-            if(x > 0 && Math.random() >= 0.5) { // connect left?
-                let duplicates = [];
-                let connNext = true;
-                for(let xi = x-1; xi > -1; xi -= 1) {
-                    const thisCell = generated_maze[y][xi];
-                    const thisCellID = thisCell[0];
-                    if (connNext) {
-                        thisCell[0] = curCellIndex;
-                        duplicates.push(thisCellID);
-                        connNext = false;
-                    } else if (duplicates.includes(thisCellID)) {
-                        thisCell[0] = curCellIndex;
-                    }
-                }
-            } else if(!forcedCellIndex){
-                cellIndex += 1;
-            }
-            row[x] = [curCellIndex];
+            // todo
+            row[x] = cellIndex;
+            cellIndex += 1;
         }
     }
     return generated_maze;
@@ -138,22 +117,22 @@ let lastFrame = Date.now();
             const cellX = Math.floor(((x - camX) / CELL_SIZE) - cellCenterOffsetX);
             const cellY = Math.floor(((y - camY) / CELL_SIZE)  - cellCenterOffsetY);
 
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 2.5;
             ctx.strokeStyle = "white";
 
             if (currentMaze[cellY] && currentMaze[cellY][cellX]) {
-                const mazeCell = currentMaze[cellY][cellX];
+                const mazeCellID = currentMaze[cellY][cellX];
                 if(cellY > 0) {
-                    const topCellData = currentMaze[cellY-1][cellX];
-                    if (!(topCellData[0] == mazeCell[0])){
+                    const topCellID = currentMaze[cellY-1][cellX];
+                    if (!(topCellID == mazeCellID)){
                         ctx.moveTo(x, y);
                         ctx.lineTo(x + CELL_SIZE, y);
                         ctx.stroke();
                     }
                 }
                 if(cellX > 0) {
-                    const leftCellData = currentMaze[cellY][cellX-1];
-                    if (!(leftCellData[0] == mazeCell[0])) {
+                    const leftCellID = currentMaze[cellY][cellX-1];
+                    if (!(leftCellID == mazeCellID)) {
                         ctx.moveTo(x, y);
                         ctx.lineTo(x, y + CELL_SIZE);
                         ctx.stroke();
