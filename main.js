@@ -1,23 +1,42 @@
 // Game Config
-const WINDOW_SIZE   =   1.25;
+const WINDOW_SIZE   =   2;
 const CELL_SIZE     =   50;
 const INPUT_RATE_ms =   100;
 let _isDebugging    =   true;
+let currentMaze;
 
 const generate_maze = (width, height) => {
     const generated_maze = new Array(height);
     let cellIndex = 0;
     for(let y = 0; y < height; y++) {
         let row = new Array(width).fill(0);
+        generated_maze[y] = row;
         for(let x = 0; x < width; x++) {
-            if(Math.random() >= 0.5) {
-                // new cell created
+            let curCellIndex = cellIndex;
+            let forcedCellIndex = false;
+            if (y > 0 && Math.random() >= 0.5) { // connect top?
+                curCellIndex = generated_maze[y-1][x][0];
+                forcedCellIndex = true;
+            }
+            if(x > 0 && Math.random() >= 0.5) { // connect left?
+                let duplicates = [];
+                let connNext = true;
+                for(let xi = x-1; xi > -1; xi -= 1) {
+                    const thisCell = generated_maze[y][xi];
+                    const thisCellID = thisCell[0];
+                    if (connNext) {
+                        thisCell[0] = curCellIndex;
+                        duplicates.push(thisCellID);
+                        connNext = false;
+                    } else if (duplicates.includes(thisCellID)) {
+                        thisCell[0] = curCellIndex;
+                    }
+                }
+            } else if(!forcedCellIndex){
                 cellIndex += 1;
             }
-            connectTop = Math.random() >= 0.5;
-            row[x] = [cellIndex, connectTop ? 1 : 0];
+            row[x] = [curCellIndex];
         }
-        generated_maze[y] = row;
     }
     return generated_maze;
 }
@@ -35,6 +54,7 @@ const onResize = () => {
     cellCenterOffsetY = Math.floor((canvas.height / 2) / CELL_SIZE);
     console.log("Resize called:");
     console.log("Canvas: ", canvas.width, canvas.height, "Center:", cellCenterOffsetX, cellCenterOffsetY);
+    currentMaze = generate_maze(Math.floor(canvas.width / CELL_SIZE), Math.floor(canvas.height / CELL_SIZE));
 }
 
 onResize();
@@ -117,6 +137,29 @@ let lastFrame = Date.now();
             // cell coordinates calculations
             const cellX = Math.floor(((x - camX) / CELL_SIZE) - cellCenterOffsetX);
             const cellY = Math.floor(((y - camY) / CELL_SIZE)  - cellCenterOffsetY);
+
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = "white";
+
+            if (currentMaze[cellY] && currentMaze[cellY][cellX]) {
+                const mazeCell = currentMaze[cellY][cellX];
+                if(cellY > 0) {
+                    const topCellData = currentMaze[cellY-1][cellX];
+                    if (!(topCellData[0] == mazeCell[0])){
+                        ctx.moveTo(x, y);
+                        ctx.lineTo(x + CELL_SIZE, y);
+                        ctx.stroke();
+                    }
+                }
+                if(cellX > 0) {
+                    const leftCellData = currentMaze[cellY][cellX-1];
+                    if (!(leftCellData[0] == mazeCell[0])) {
+                        ctx.moveTo(x, y);
+                        ctx.lineTo(x, y + CELL_SIZE);
+                        ctx.stroke();
+                    }
+                }
+            }
 
             if (_isDebugging) {
                 // draw coordinates on the cells
