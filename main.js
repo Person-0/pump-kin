@@ -117,28 +117,28 @@ let lastFrame = Date.now();
             const cellX = Math.floor(((x - camX) / CELL_SIZE) - cellCenterOffsetX);
             const cellY = Math.floor(((y - camY) / CELL_SIZE)  - cellCenterOffsetY);
 
+            // draw maze acc to ids in the current maze array
             ctx.lineWidth = 2.5;
             ctx.strokeStyle = "white";
-
+            ctx.beginPath();
             if (currentMaze[cellY] && currentMaze[cellY][cellX]) {
                 const mazeCellID = currentMaze[cellY][cellX];
                 if(cellY > 0) {
                     const topCellID = currentMaze[cellY-1][cellX];
                     if (!(topCellID == mazeCellID)){
-                        ctx.moveTo(x, y);
-                        ctx.lineTo(x + CELL_SIZE, y);
-                        ctx.stroke();
+                        ctx.moveTo(x + camEffX, y + camEffY);
+                        ctx.lineTo(x + CELL_SIZE + camEffX, y + camEffY);
                     }
                 }
                 if(cellX > 0) {
                     const leftCellID = currentMaze[cellY][cellX-1];
                     if (!(leftCellID == mazeCellID)) {
-                        ctx.moveTo(x, y);
-                        ctx.lineTo(x, y + CELL_SIZE);
-                        ctx.stroke();
+                        ctx.moveTo(x + camEffX, y + camEffY);
+                        ctx.lineTo(x + camEffX, y + CELL_SIZE + camEffY);
                     }
                 }
             }
+            ctx.stroke();
 
             if (_isDebugging) {
                 // draw coordinates on the cells
