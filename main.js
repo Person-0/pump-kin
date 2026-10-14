@@ -4,6 +4,24 @@ const CELL_SIZE     =   50;
 const INPUT_RATE_ms =   100;
 let _isDebugging    =   true;
 
+const generate_maze = (width, height) => {
+    const generated_maze = new Array(height);
+    let cellIndex = 0;
+    for(let y = 0; y < height; y++) {
+        let row = new Array(width).fill(0);
+        for(let x = 0; x < width; x++) {
+            if(Math.random() >= 0.5) {
+                // new cell created
+                cellIndex += 1;
+            }
+            connectTop = Math.random() >= 0.5;
+            row[x] = [cellIndex, connectTop ? 1 : 0];
+        }
+        generated_maze[y] = row;
+    }
+    return generated_maze;
+}
+
 // Canvas setup
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
