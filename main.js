@@ -38,6 +38,15 @@ const generateColumn = (height, refCol) => {
 
 }
 
+const generateMaze = (width, height) => {
+    const result = [];
+    for(let i = 0; i < height; i++) {
+        const newRow = generateRow(width, result[i-1]);
+        result.push(newRow);
+    }
+    return result;
+}
+
 // maze vertical shift
 // pos => 1: bottom, 0: top
 // bottom -> remove top row, add a row on bottom
@@ -78,7 +87,7 @@ const onResize = () => {
     cellCenterOffsetY = Math.floor((canvas.height / 2) / CELL_SIZE);
     console.log("Resize called:");
     console.log("Canvas: ", canvas.width, canvas.height, "Center:", cellCenterOffsetX, cellCenterOffsetY);
-    currentMaze = generate_maze(Math.floor(canvas.width / CELL_SIZE), Math.floor(canvas.height / CELL_SIZE));
+    currentMaze = generateMaze(Math.floor(canvas.width / CELL_SIZE), Math.floor(canvas.height / CELL_SIZE));
 }
 
 onResize();
@@ -163,6 +172,7 @@ let lastFrame = Date.now();
             const cellY = Math.floor(((y - camY) / CELL_SIZE)  - cellCenterOffsetY);
 
             // draw maze acc to ids in the current maze array
+            // todo: fix maze rendering!
             ctx.lineWidth = 2.5;
             ctx.strokeStyle = "white";
             ctx.beginPath();
@@ -171,15 +181,15 @@ let lastFrame = Date.now();
                 if(cellY > 0) {
                     const topCellID = currentMaze[cellY-1][cellX];
                     if (!(topCellID == mazeCellID)){
-                        ctx.moveTo(x + camEffX, y + camEffY);
-                        ctx.lineTo(x + CELL_SIZE + camEffX, y + camEffY);
+                        ctx.moveTo(camEffX, camEffY);
+                        ctx.lineTo(CELL_SIZE + camEffX, camEffY);
                     }
                 }
                 if(cellX > 0) {
                     const leftCellID = currentMaze[cellY][cellX-1];
                     if (!(leftCellID == mazeCellID)) {
-                        ctx.moveTo(x + camEffX, y + camEffY);
-                        ctx.lineTo(x + camEffX, y + CELL_SIZE + camEffY);
+                        ctx.moveTo(camEffX, camEffY);
+                        ctx.lineTo(camEffX, CELL_SIZE + camEffY);
                     }
                 }
             }
