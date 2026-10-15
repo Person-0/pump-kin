@@ -1,23 +1,68 @@
 // Game Config
-const WINDOW_SIZE   =   2;
+const WINDOW_SIZE   =   1.25;
 const CELL_SIZE     =   50;
 const INPUT_RATE_ms =   100;
 let _isDebugging    =   true;
-let currentMaze;
 
-const generate_maze = (width, height) => {
-    const generated_maze = new Array(height);
-    let cellIndex = 0;
-    for(let y = 0; y < height; y++) {
-        let row = new Array(width).fill(0);
-        generated_maze[y] = row;
-        for(let x = 0; x < width; x++) {
-            // todo
-            row[x] = cellIndex;
-            cellIndex += 1;
+// MAZE LOGIC
+const CELL_STATS = {
+    "UNCONNECTED": 0,
+    "LEFTCONNECTED": 1,
+    "TOPCONNECTED": 2,
+    "LTCONNECTED": 3
+}
+let currentMaze = [];
+const coinflip = () => Math.random() >= 0.5; // 50% chance for true or false
+
+// wip
+const generateRow = (width, refRow) => {
+    const row = [];
+    for(let x = 0; x < width; x++) {
+        let cellStat = CELL_STATS.UNCONNECTED;
+        if (x > 0 && coinflip()) {
+            cellStat = CELL_STATS.LEFTCONNECTED;
         }
+        if (refRow) {
+            let needsTopConnection = false; 
+            // todo: add top connection forcefully if top set has no bottom connections
+            // and this is the last cell that can be connected to top,
+            // otherwise 50% chance of top connection
+        }
+        row.push(cellStat);
     }
-    return generated_maze;
+    return row;
+}
+
+// wip
+const generateColumn = (height, refCol) => {
+
+}
+
+// maze vertical shift
+// pos => 1: bottom, 0: top
+// bottom -> remove top row, add a row on bottom
+// top -> remove bottom row, add a row on top
+const maze_vshift = (pos) => {
+    let refRow;
+    if (pos) {
+        refRow = currentMaze[currentMaze.length-1];
+        currentMaze.shift();
+        currentMaze.push(generateRow(refRow));
+    } else {
+        refRow = currentMaze[0];
+        currentMaze.pop();
+        generateRow(refRow);
+        currentMaze.unshift(generateRow(refRow));
+    }
+}
+
+// wip
+// maze horizontal shift
+// pos => 1: right, 0: left
+// right -> remove leftmost column, add a column at right
+// left -> remove rightmost column, add a column at left
+const maze_hshift = (pos) => {
+    let refCol;
 }
 
 // Canvas setup
