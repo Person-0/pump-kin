@@ -1,5 +1,5 @@
 // Game Config
-const WINDOW_SIZE   =   1.25;
+const WINDOW_SIZE   =   1.15;
 const CELL_SIZE     =   50;
 const INPUT_RATE_ms =   100;
 let _isDebugging    =   true;
@@ -238,8 +238,8 @@ let lastFrame = Date.now();
         }
     }
 
-    camEffX = lerp(camEffX, 0, 0.01 * delta);
-    camEffY = lerp(camEffY, 0, 0.01 * delta);
+    camEffX = lerp(camEffX, 0, 0.0025 * delta);
+    camEffY = lerp(camEffY, 0, 0.0025 * delta);
 
     requestAnimationFrame(animate);
 })();
