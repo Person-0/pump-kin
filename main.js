@@ -6,10 +6,10 @@ let _isDebugging    =   true;
 
 // MAZE LOGIC
 const CELL_STATS = {
-    "UNCONNECTED": 0,
-    "LEFTCONNECTED": 1,
-    "TOPCONNECTED": 2,
-    "LTCONNECTED": 3
+    "UNCONNECTED": 1,
+    "LEFTCONNECTED": 2,
+    "TOPCONNECTED": 3,
+    "LTCONNECTED": 4
 }
 let currentMaze = [];
 const coinflip = () => Math.random() >= 0.5; // 50% chance for true or false
