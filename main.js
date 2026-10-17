@@ -5,6 +5,7 @@ const INPUT_RATE_ms =   100;
 let _isDebugging    =   true;
 
 // MAZE LOGIC
+let mazeSizeExtra = 5;
 const CELL_STATS = {
     "UNCONNECTED": 1,
     "LEFTCONNECTED": 2,
@@ -14,7 +15,7 @@ const CELL_STATS = {
 let currentMaze = [];
 const coinflip = () => Math.random() >= 0.5; // 50% chance for true or false
 
-// wip
+// still wip, does not work properly
 const generateRow = (width, refRow) => {
     const row = [];
     for(let x = 0; x < width; x++) {
@@ -23,10 +24,26 @@ const generateRow = (width, refRow) => {
             cellStat = CELL_STATS.LEFTCONNECTED;
         }
         if (refRow) {
-            let needsTopConnection = false; 
-            // todo: add top connection forcefully if top set has no bottom connections
-            // and this is the last cell that can be connected to top,
-            // otherwise 50% chance of top connection
+            let addTopConnection = coinflip();
+            if (
+                !addTopConnection &&
+                refRow[x+1] &&
+                !(refRow[x+1] === CELL_STATS.LEFTCONNECTED)
+            ) {
+                // last cell in the above set, checking if it is connected
+                // as we require atleast 1 connection
+                let connFound = false;
+                for (let xi = x; xi > -1; xi-=1) {
+                    if (refRow[xi] === CELL_STATS.UNCONNECTED) break;
+                    if (row[xi] === CELL_STATS.TOPCONNECTED || row[xi] === CELL_STATS.LTCONNECTED) {
+                        connFound = true;
+                    }
+                }
+                if (!connFound) addTopConnection = true;
+            }
+            if (addTopConnection) {
+                cellStat = CELL_STATS.LEFTCONNECTED ? CELL_STATS.LTCONNECTED : CELL_STATS.TOPCONNECTED;
+            }
         }
         row.push(cellStat);
     }
@@ -56,12 +73,12 @@ const maze_vshift = (pos) => {
     if (pos) {
         refRow = currentMaze[currentMaze.length-1];
         currentMaze.shift();
-        currentMaze.push(generateRow(refRow));
+        currentMaze.push(generateRow(currentMaze[0].length, refRow));
     } else {
         refRow = currentMaze[0];
         currentMaze.pop();
         generateRow(refRow);
-        currentMaze.unshift(generateRow(refRow));
+        currentMaze.unshift(generateRow(currentMaze[0].length, refRow));
     }
 }
 
@@ -87,7 +104,10 @@ const onResize = () => {
     cellCenterOffsetY = Math.floor((canvas.height / 2) / CELL_SIZE);
     console.log("Resize called:");
     console.log("Canvas: ", canvas.width, canvas.height, "Center:", cellCenterOffsetX, cellCenterOffsetY);
-    currentMaze = generateMaze(Math.floor(canvas.width / CELL_SIZE), Math.floor(canvas.height / CELL_SIZE));
+    currentMaze = generateMaze(
+        Math.floor(canvas.width  / CELL_SIZE) + mazeSizeExtra,
+        Math.floor(canvas.height / CELL_SIZE) + mazeSizeExtra
+    );
 }
 
 onResize();
@@ -118,13 +138,15 @@ canvas.addEventListener("keydown", keyEventHandler("keydown"));
 canvas.addEventListener("keyup", keyEventHandler("keyup"));
 
 const readInputs = () => {
-    if (pressed_keys["w"]) {
-        camY += CELL_SIZE;
-        camEffY -= CELL_SIZE;
-    }
     if (pressed_keys["s"]) {
         camY -= CELL_SIZE;
         camEffY += CELL_SIZE;
+        maze_vshift(1);
+    }
+    if (pressed_keys["w"]) {
+        camY += CELL_SIZE;
+        camEffY -= CELL_SIZE;
+        maze_vshift(0);
     }
     if (pressed_keys["d"]) {
         camX -= CELL_SIZE;
@@ -164,36 +186,37 @@ let lastFrame = Date.now();
 
             // this just draws a semi-transparent matrix
             // might remove later if looks better without it
-            ctx.strokeStyle = "rgba(255,255,255,0.1)";
+            ctx.strokeStyle = "rgba(255,255,255,0.025)";
             ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
 
             // cell coordinates calculations
             const cellX = Math.floor(((x - camX) / CELL_SIZE) - cellCenterOffsetX);
-            const cellY = Math.floor(((y - camY) / CELL_SIZE)  - cellCenterOffsetY);
+            const cellY = Math.floor(((y - camY) / CELL_SIZE) - cellCenterOffsetY);
 
-            // draw maze acc to ids in the current maze array
-            // todo: fix maze rendering!
-            ctx.lineWidth = 2.5;
-            ctx.strokeStyle = "white";
-            ctx.beginPath();
-            if (currentMaze[cellY] && currentMaze[cellY][cellX]) {
-                const mazeCellID = currentMaze[cellY][cellX];
-                if(cellY > 0) {
-                    const topCellID = currentMaze[cellY-1][cellX];
-                    if (!(topCellID == mazeCellID)){
-                        ctx.moveTo(camEffX, camEffY);
-                        ctx.lineTo(CELL_SIZE + camEffX, camEffY);
-                    }
+            // draw maze
+            const mazeCellX = Math.floor(x / CELL_SIZE);
+            const mazeCellY = Math.floor(y / CELL_SIZE);
+            if (currentMaze[mazeCellY]) {
+                const mazeCellData = currentMaze[mazeCellY][mazeCellX];
+                let drawLeft = mazeCellData === CELL_STATS.LEFTCONNECTED;
+                let drawTop = mazeCellData === CELL_STATS.TOPCONNECTED;
+                if (mazeCellData === CELL_STATS.LTCONNECTED) {
+                    drawLeft = true;
+                    drawTop = true;
                 }
-                if(cellX > 0) {
-                    const leftCellID = currentMaze[cellY][cellX-1];
-                    if (!(leftCellID == mazeCellID)) {
-                        ctx.moveTo(camEffX, camEffY);
-                        ctx.lineTo(camEffX, CELL_SIZE + camEffY);
-                    }
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = "white";
+                ctx.beginPath();
+                if (drawTop) {
+                    ctx.moveTo(x + camEffX, y + camEffY);
+                    ctx.lineTo(x + CELL_SIZE + camEffX, y + camEffY);
                 }
+                if (drawLeft) {
+                    ctx.moveTo(x + camEffX, y + camEffY);
+                    ctx.lineTo(x + camEffX, CELL_SIZE + y + camEffY);
+                }
+                ctx.stroke();
             }
-            ctx.stroke();
 
             if (_isDebugging) {
                 // draw coordinates on the cells
@@ -215,8 +238,8 @@ let lastFrame = Date.now();
         }
     }
 
-    camEffX = lerp(camEffX, 0, 0.0025 * delta);
-    camEffY = lerp(camEffY, 0, 0.0025 * delta);
+    camEffX = lerp(camEffX, 0, 0.01 * delta);
+    camEffY = lerp(camEffY, 0, 0.01 * delta);
 
     requestAnimationFrame(animate);
 })();
