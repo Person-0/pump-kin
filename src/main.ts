@@ -5,18 +5,18 @@ const INPUT_RATE_ms =   100;
 let _isDebugging    =   true;
 
 // MAZE LOGIC
-let mazeSizeExtra = 5;
+let mazeSizeExtra = 10;
 const CELL_STATS = {
     "UNCONNECTED": 1,
     "LEFTCONNECTED": 2,
     "TOPCONNECTED": 3,
     "LTCONNECTED": 4
 }
-let currentMaze = [];
+let currentMaze: number[][] = [];
 const coinflip = () => Math.random() >= 0.5; // 50% chance for true or false
 
 // still wip, does not work properly
-const generateRow = (width, refRow) => {
+const generateRow = (width: number, refRow: number[]) => {
     const row = [];
     for(let x = 0; x < width; x++) {
         let cellStat = CELL_STATS.UNCONNECTED;
@@ -51,11 +51,11 @@ const generateRow = (width, refRow) => {
 }
 
 // wip
-const generateColumn = (height, refCol) => {
+const generateColumn = (height: number, refCol: number) => {
 
 }
 
-const generateMaze = (width, height) => {
+const generateMaze = (width: number, height: number) => {
     const result = [];
     for(let i = 0; i < height; i++) {
         const newRow = generateRow(width, result[i-1]);
@@ -68,7 +68,7 @@ const generateMaze = (width, height) => {
 // pos => 1: bottom, 0: top
 // bottom -> remove top row, add a row on bottom
 // top -> remove bottom row, add a row on top
-const maze_vshift = (pos) => {
+const maze_vshift = (pos: number) => {
     let refRow;
     if (pos) {
         refRow = currentMaze[currentMaze.length-1];
@@ -77,7 +77,6 @@ const maze_vshift = (pos) => {
     } else {
         refRow = currentMaze[0];
         currentMaze.pop();
-        generateRow(refRow);
         currentMaze.unshift(generateRow(currentMaze[0].length, refRow));
     }
 }
@@ -87,16 +86,20 @@ const maze_vshift = (pos) => {
 // pos => 1: right, 0: left
 // right -> remove leftmost column, add a column at right
 // left -> remove rightmost column, add a column at left
-const maze_hshift = (pos) => {
+const maze_hshift = (pos: number) => {
     let refCol;
 }
 
 // Canvas setup
-const canvas = document.getElementById("game");
+const canvas = document.getElementById("game") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d");
+if (!ctx) {
+    alert("canvas rendering context could not be created!");
+    throw "ctx err";
+}
 
-let cellCenterOffsetX;
-let cellCenterOffsetY;
+let cellCenterOffsetX = 0;
+let cellCenterOffsetY = 0;
 const onResize = () => {
     canvas.width = Math.floor(window.innerWidth / WINDOW_SIZE);
     canvas.height = Math.floor(window.innerHeight / WINDOW_SIZE);
@@ -114,10 +117,10 @@ onResize();
 window.onresize = onResize;
 
 // Inputs
-const pressed_keys = {};
+const pressed_keys: Record<string, number> = {};
 
-const keyEventHandler = (eventName) => {
-    return (e) => {
+const keyEventHandler = (eventName: string) => {
+    return (e: {key: string}) => {
         let key = e.key.toLowerCase();
         if (!key.length) return;
         if (key === " ") {
@@ -222,9 +225,9 @@ let lastFrame = Date.now();
                 // draw coordinates on the cells
                 ctx.font = "15px monospace"; 
                 ctx.fillStyle = "red";
-                ctx.fillText(cellX, x + camEffX + 20, y + camEffY + 20);
+                ctx.fillText(cellX.toString(), x + camEffX + 20, y + camEffY + 20);
                 ctx.fillStyle = "lime";
-                ctx.fillText(cellY, x + camEffX + 20, y + camEffY + 40);
+                ctx.fillText(cellY.toString(), x + camEffX + 20, y + camEffY + 40);
             }
 
             // draw player at center
@@ -245,7 +248,6 @@ let lastFrame = Date.now();
 })();
 
 // Utils
-
-function lerp(a, b, t) {
+function lerp(a: number, b: number, t: number) {
     return a + (b - a)*t;
 }

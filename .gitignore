@@ -3,3 +3,4 @@
 *.lck
 ~*
 !.gitignore
+node_modules
