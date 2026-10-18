@@ -2,7 +2,8 @@
 const WINDOW_SIZE   =   1.15;
 const CELL_SIZE     =   50;
 const INPUT_RATE_ms =   100;
-const camAnimLerp   =   0.001;
+const camAnimLerp   =   0.03;
+const playerMoveEff =   2;
 window._isDebugging =   true;
 
 // MAZE LOGIC
@@ -231,8 +232,8 @@ let lastFrame = Date.now();
             // draw player at center
             ctx.fillStyle = "red";
             ctx.fillRect(
-                (cellCenterOffsetX * CELL_SIZE) + camEffX,
-                (cellCenterOffsetY * CELL_SIZE) + camEffY,
+                (cellCenterOffsetX * CELL_SIZE) + (camEffX / playerMoveEff),
+                (cellCenterOffsetY * CELL_SIZE) + (camEffY / playerMoveEff),
                 CELL_SIZE, CELL_SIZE
             );
 
