@@ -8,99 +8,35 @@ window._isDebugging = true;
 
 // MAZE LOGIC types
 type intBool = 0 | 1;
-type mazeCellDataType = [left: intBool, bottom: intBool, CID: number];
+type mazeCellDataType = [right: intBool, bottom: intBool];
 type mazeRowDataType = mazeCellDataType[];
 type mazeColDataType = mazeRowDataType;
 type mazeDataType = mazeRowDataType[];
 
 // MAZE LOGIC
 let mazeSizeExtra = 5;
-enum CELL_DATA {
-    LEFT,
-    TOP,
-    CID
+enum CELL_DATA { // open = true (1)
+    RIGHT,
+    TOP
 }
 let currMazeID = 0;
 let currentMaze: mazeDataType = [];
 const coinflip = () => Math.random() >= 0.5; // 50% chance for true or false
 
-const genStarterRow = (width: number) => {
-
+const generateRow = (width: number) => {
     const row: mazeRowDataType = [];
-
+    let t = 0;
     for (let x = 0; x < width; x++) {
-        const genCell: mazeCellDataType = [0, 0, currMazeID];
-        if (x > 0 && coinflip()) {
-            genCell[CELL_DATA.LEFT] = 1;
-            genCell[CELL_DATA.CID] = row[x-1][CELL_DATA.CID];
-        } else {
-            currMazeID += 1;
-        }
-        if (x > 0 && coinflip()) {
-            genCell[CELL_DATA.TOP] = 1;
-        }
-        row.push(genCell);
-    }
-
-    return row;
-}
-
-const generateRow = (width: number, refRow?: mazeRowDataType) => {
-
-    if (!refRow) return genStarterRow(width); // return starter row if no refRow
-
-    const row: mazeRowDataType = [];
-
-    // 1st pass -> random vertical connects
-    for (let x = 0; x < width; x++) {
-        const genCell: mazeCellDataType = [0, 0, currMazeID];
-        if (coinflip()) {
-            const topCell = refRow[x];
-            genCell[CELL_DATA.TOP] = 1;
-            genCell[CELL_DATA.CID] = topCell[CELL_DATA.CID];
-        } else {
-            currMazeID += 1;
-        }
-        row.push(genCell);
-    }
-
-    // 2nd pass -> finding cells which have no vertical connections from refRow
-    const nonConnectedIDS: number[] = [];
-    for (const refcell of refRow) {
-        const refcellID = refcell[CELL_DATA.CID];
-        let foundConn = false;
-        for (const cell of row) {
-            if (cell[CELL_DATA.CID] === refcellID) {
-                foundConn = true;
-                break;
-            }
-        }
-        if (!foundConn) {
-            nonConnectedIDS.push(refcellID);
+        const defaultCell: mazeCellDataType = [0, 0];
+        defaultCell[CELL_DATA.RIGHT] = 1;
+        row.push(defaultCell);
+        if (coinflip()) { // stop carving!
+            row[x][CELL_DATA.RIGHT] = 0;
+            const choice = Math.floor(t + (Math.random() * (x - t + 1))); // random from x to t
+            t = x + 1;
+            row[choice][CELL_DATA.TOP] = 1;
         }
     }
-
-    // 3rd pass -> adding random connections for 2nd pass cells
-    for (const id of nonConnectedIDS) {
-        let indexes: number[] = [];
-        for (let x = 0; x < width; x++) {
-            if (refRow[x][CELL_DATA.CID] === id) {
-                indexes.push(x);
-            }
-        }
-        const selX = indexes[Math.floor(Math.random() * (indexes.length))];
-        const selCell = row[selX];
-        const selID = refRow[selX][CELL_DATA.CID];
-        const id2repl = selCell[CELL_DATA.CID];
-        selCell[CELL_DATA.CID] = selID;
-        selCell[CELL_DATA.TOP] = 1
-        for (let x = 0; x < width; x++) {
-            if (row[x][CELL_DATA.CID] === id2repl) {
-                row[x][CELL_DATA.CID] = selID;
-            }
-        }
-    }
-
     return row;
 }
 
@@ -112,8 +48,7 @@ const generateColumn = (height: number, refCol: mazeColDataType): mazeColDataTyp
 const generateMaze = (width: number, height: number) => {
     const result: mazeDataType = [];
     for (let i = 0; i < height; i++) {
-        const newRow = generateRow(width, result[i - 1]);
-        result.push(newRow);
+        result.push(generateRow(width));
     }
     return result;
 }
@@ -123,15 +58,12 @@ const generateMaze = (width: number, height: number) => {
 // bottom -> remove top row, add a row on bottom
 // top -> remove bottom row, add a row on top
 const maze_vshift = (pos: number) => {
-    let refRow;
     if (pos) {
-        refRow = currentMaze[currentMaze.length - 1];
         currentMaze.shift();
-        currentMaze.push(generateRow(currentMaze[0].length, refRow));
+        currentMaze.push(generateRow(currentMaze[0].length));
     } else {
-        refRow = currentMaze[0];
         currentMaze.pop();
-        currentMaze.unshift(generateRow(currentMaze[0].length, refRow));
+        currentMaze.unshift(generateRow(currentMaze[0].length));
     }
 }
 
@@ -264,9 +196,9 @@ let lastFrame = Date.now();
                     ctx.moveTo(x + camEffX, y + camEffY);
                     ctx.lineTo(x + CELL_SIZE + camEffX, y + camEffY);
                 }
-                if (!mazeCellData[CELL_DATA.LEFT]) {
-                    ctx.moveTo(x + camEffX, y + camEffY);
-                    ctx.lineTo(x + camEffX, CELL_SIZE + y + camEffY);
+                if (!mazeCellData[CELL_DATA.RIGHT]) {
+                    ctx.moveTo(x + CELL_SIZE + camEffX, y + camEffY);
+                    ctx.lineTo(x + CELL_SIZE + camEffX, CELL_SIZE + y + camEffY);
                 }
 
                 ctx.stroke();
