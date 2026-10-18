@@ -2,7 +2,7 @@
 const WINDOW_SIZE   =   1.15;
 const CELL_SIZE     =   50;
 const INPUT_RATE_ms =   100;
-let _isDebugging    =   true;
+window._isDebugging    =   true;
 
 // MAZE LOGIC
 let mazeSizeExtra = 10;
@@ -221,7 +221,7 @@ let lastFrame = Date.now();
                 ctx.stroke();
             }
 
-            if (_isDebugging) {
+            if (window._isDebugging) {
                 // draw coordinates on the cells
                 ctx.font = "15px monospace"; 
                 ctx.fillStyle = "red";
