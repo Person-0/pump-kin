@@ -5,6 +5,7 @@ import {CELL_DATA, mazeDataType, mazeCellDataType, mazeRowDataType} from "./type
 
 // Game Config
 const WINDOW_SIZE = 1.15;
+const MAZE_EXTRA = 1;
 const CELL_SIZE = 75; // fixed
 const CELL_WIDTH = 5;
 const GRID_WIDTH = 5;
@@ -13,14 +14,15 @@ const CharAnimStep = 250;
 const camAnimLerp = 0.01;
 const playerMoveEff = 2;
 const playerScale = 2.15;
-const NPC_count = 5;
-const NPC_spawnTime = 250;
-const NPC_moveSpeedMS = 1000;
+const NPC_count = 3;
+const NPC_spawnTime = 500;
+const NPC_moveSpeedMS = 600;
+const NPC_instantMove = false;
+
 window._isDebugging = false;
 
 // MAZE LOGIC
-const NPCS = new NPCManager(NPC_count, NPC_spawnTime, NPC_moveSpeedMS);
-let mazeSizeExtra = 125;
+const NPCS = new NPCManager(NPC_count, NPC_spawnTime, NPC_moveSpeedMS, NPC_instantMove);
 let currentMaze: mazeDataType = [];
 const Collisions = new CollisionHandler();
 const coinflip = () => Math.random() >= 0.5; // 50% chance for true or false
@@ -100,8 +102,8 @@ const onResize = () => {
     console.log("Resize called:");
     console.log("Canvas: ", canvas.width, canvas.height, "Center:", cellCenterOffsetX, cellCenterOffsetY);
     currentMaze = generateMaze(
-        Math.floor(canvas.width / CELL_SIZE) + mazeSizeExtra,
-        Math.floor(canvas.height / CELL_SIZE) + mazeSizeExtra
+        Math.floor(canvas.width / CELL_SIZE) + MAZE_EXTRA,
+        Math.floor(canvas.height / CELL_SIZE) + MAZE_EXTRA
     );
 }
 

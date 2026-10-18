@@ -45,6 +45,7 @@ export default class CharactersLoader {
     animStep(delta: number) {
         this.timer += delta;
         if (this.timer >= this.animStepMS) {
+            this.timer = 0;
             this.ghost.frameIndex += 1;
             if (this.ghost.frameIndex >= this.ghost.frames.length) {
                 this.ghost.frameIndex = 0;

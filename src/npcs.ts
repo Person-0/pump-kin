@@ -14,10 +14,12 @@ class NPC {
     x: number;
     y: number;
     moveDir: number; // 0-3 -> top, right, bottom, left
+    instantMove = false;
 
-    constructor(px: number, py: number) {
+    constructor(px: number, py: number, instantMove = false) {
         this.x = px;
         this.y = py;
+        this.instantMove = instantMove;
         this.moveDir = Math.floor(Math.random()*4);
     }
 
@@ -50,7 +52,13 @@ class NPC {
                 break;
         }
         if (!didMove) {
-            this.moveDir = Math.floor(Math.random()*4);
+            let allowedDIRS: number[] = [];
+            if(Collisions.canMoveLeft(maze, this.x, this.y)) allowedDIRS.push(moveDir.LEFT);
+            if(Collisions.canMoveRight(maze, this.x, this.y)) allowedDIRS.push(moveDir.RIGHT);
+            if(Collisions.canMoveUp(maze, this.x, this.y)) allowedDIRS.push(moveDir.TOP);
+            if(Collisions.canMoveDown(maze, this.x, this.y)) allowedDIRS.push(moveDir.BOTTOM);
+            this.moveDir = allowedDIRS[Math.floor(Math.random()*allowedDIRS.length)];
+            if (this.instantMove) this.move(maze);
         }
     }
 }
@@ -58,15 +66,17 @@ class NPC {
 export class NPCManager {
     maxNPCs: number;
     moveSpeedMS: number;
+    instantMove = false;
     spawnTime: number;
     spawnTimer = 0;
     moveTimer = 0;
     currentNPCs: NPC[] = [];
 
-    constructor(_maxNPCS: number, _spawnTime: number, _moveSpeedMS: number) {
+    constructor(_maxNPCS: number, _spawnTime: number, _moveSpeedMS: number, _instantMove: boolean) {
         this.maxNPCs = _maxNPCS;
         this.spawnTime = _spawnTime;
         this.moveSpeedMS = _moveSpeedMS;
+        this.instantMove = _instantMove;
     }
 
     step(maze: mazeDataType, delta: number) {
@@ -74,7 +84,7 @@ export class NPCManager {
             this.spawnTimer += delta;
             if (this.spawnTimer >= this.spawnTime) {
                 this.spawnTimer = 0;
-                this.spawn();
+                this.spawn(maze);
             }
         }
         this.moveTimer += delta;
@@ -83,8 +93,8 @@ export class NPCManager {
             for(const npc of this.currentNPCs) {
                 npc.move(maze);
             }
+            this._oobCheck(maze);
         }
-        this._oobCheck(maze);
     }
 
     draw(
@@ -104,8 +114,10 @@ export class NPCManager {
         }
     }
 
-    spawn() {
-        const newNPC = new NPC(0,0);
+    spawn(maze: mazeDataType) {
+        const randomX = Math.floor(Math.random() * (maze[0].length));
+        const randomY = Math.floor(Math.random() * (maze.length));
+        const newNPC = new NPC(randomX, randomY, this.instantMove);
         this.currentNPCs.push(newNPC);
     }
 
