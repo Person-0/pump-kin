@@ -1,3 +1,3 @@
 # **MazePumpkin**
 
-An infinite maze game where you need to collect pumpkins while avoiding ghosts.
+An infinite maze game where you're a pumpkin and need to avoid ghosts.

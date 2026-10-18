@@ -1,7 +1,7 @@
 {
-  "name": "pump-kin",
+  "name": "MazePumpkin",
   "version": "1.0.0",
-  "description": "collect pumpkins while avoiding ghosts",
+  "description": "you're a pumpkin and need to avoid ghosts",
   "license": "MIT",
   "author": "Person-0",
   "type": "commonjs",
