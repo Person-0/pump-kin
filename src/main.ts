@@ -1,4 +1,5 @@
 import CharactersLoader from "./characters";
+import { NPCManager } from "./npcs";
 import CollisionHandler from "./collisions";
 import {CELL_DATA, mazeDataType, mazeCellDataType, mazeRowDataType} from "./types";
 
@@ -7,7 +8,7 @@ const WINDOW_SIZE = 1.15;
 const CELL_SIZE = 75; // fixed
 const CELL_WIDTH = 5;
 const GRID_WIDTH = 5;
-const GRID_COLOR = "rgba(255, 255, 255, 0.025)";
+const GRID_COLOR = "rgba(254, 158, 61, 0.05)";
 const CharAnimStep = 250;
 const camAnimLerp = 0.01;
 const playerMoveEff = 2;
@@ -15,6 +16,7 @@ const playerScale = 2.15;
 window._isDebugging = false;
 
 // MAZE LOGIC
+const NPCS = new NPCManager(50, 250, 500);
 let mazeSizeExtra = 125;
 let currentMaze: mazeDataType = [];
 const Collisions = new CollisionHandler();
@@ -178,8 +180,10 @@ let lastFrame = Date.now();
 (function animate() {
     const now = Date.now();
     const delta = now - lastFrame;
-    characters.animStep(delta);
     lastFrame = now;
+
+    characters.animStep(delta);
+    NPCS.step(currentMaze, delta);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -241,6 +245,8 @@ let lastFrame = Date.now();
                 CELL_SIZE - playerSizeReduction * 2, CELL_SIZE - playerSizeReduction * 2
             );
 
+            // npcs
+            NPCS.draw(ctx, characters.ghost.base, CELL_SIZE, camEffX, camEffY);
         }
     }
 
