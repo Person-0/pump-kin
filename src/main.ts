@@ -74,7 +74,7 @@ const maze_vshift = (pos: number) => {
 const maze_hshift = (pos: number) => {
     const height = currentMaze.length;
     const generated = generateRow(height);
-    for(let y = 0; y < height; y++) {
+    for (let y = 0; y < height; y++) {
         if (pos) {
             currentMaze[y].shift();
             currentMaze[y].push(generated[y]);
@@ -137,30 +137,41 @@ canvas.addEventListener("keydown", keyEventHandler("keydown"));
 canvas.addEventListener("keyup", keyEventHandler("keyup"));
 
 const readInputs = () => {
-    if (pressed_keys["s"]) {
-        camY -= CELL_SIZE;
-        camEffY += CELL_SIZE;
-        maze_vshift(1);
+    const mx = cellCenterOffsetX;
+    const my = cellCenterOffsetY;
+    if (pressed_keys["s"]) { // player move down
+        if (currentMaze[my+1][mx][CELL_DATA.TOP]) {
+            camY -= CELL_SIZE;
+            camEffY += CELL_SIZE;
+            maze_vshift(1);
+        }
         delete pressed_keys["s"];
     }
-    if (pressed_keys["w"]) {
-        camY += CELL_SIZE;
-        camEffY -= CELL_SIZE;
-        maze_vshift(0);
+    if (pressed_keys["w"]) { // player move up
+        if (currentMaze[my][mx][CELL_DATA.TOP]) {
+            camY += CELL_SIZE;
+            camEffY -= CELL_SIZE;
+            maze_vshift(0);
+        }
         delete pressed_keys["w"];
     }
-    if (pressed_keys["d"]) {
-        camX -= CELL_SIZE;
-        camEffX += CELL_SIZE;
-        maze_hshift(1);
+    if (pressed_keys["d"]) { // player move right
+        if (currentMaze[my][mx][CELL_DATA.RIGHT]) {
+            camX -= CELL_SIZE;
+            camEffX += CELL_SIZE;
+            maze_hshift(1);
+        }
         delete pressed_keys["d"];
     }
-    if (pressed_keys["a"]) {
-        camX += CELL_SIZE;
-        camEffX -= CELL_SIZE;
-        maze_hshift(0);
+    if (pressed_keys["a"]) { // player move left
+        if (currentMaze[my][mx-1][CELL_DATA.RIGHT]) {
+            camX += CELL_SIZE;
+            camEffX -= CELL_SIZE;
+            maze_hshift(0);
+        }
         delete pressed_keys["a"];
     }
+    console.log(camX, camY);
 }
 
 // Camera state
