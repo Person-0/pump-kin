@@ -1,30 +1,23 @@
+import CharactersLoader from "./characters";
+import CollisionHandler from "./collisions";
+import {CELL_DATA, mazeDataType, mazeCellDataType, mazeRowDataType} from "./types";
+
 // Game Config
 const WINDOW_SIZE = 1.15;
-const CELL_SIZE = 75;
+const CELL_SIZE = 75; // fixed
 const CELL_WIDTH = 5;
 const GRID_WIDTH = 5;
 const GRID_COLOR = "rgba(255, 255, 255, 0.025)";
-const INPUT_RATE_ms = 100;
-const camAnimLerp = 0.03;
+const CharAnimStep = 250;
+const camAnimLerp = 0.01;
 const playerMoveEff = 2;
-const playerScale = 1.7;
+const playerScale = 2.15;
 window._isDebugging = false;
 
-// MAZE LOGIC types
-type intBool = 0 | 1;
-type mazeCellDataType = [right: intBool, bottom: intBool];
-type mazeRowDataType = mazeCellDataType[];
-type mazeColDataType = mazeRowDataType;
-type mazeDataType = mazeRowDataType[];
-
 // MAZE LOGIC
-let mazeSizeExtra = 5;
-enum CELL_DATA { // open = true (1)
-    RIGHT,
-    TOP
-}
-let currMazeID = 0;
+let mazeSizeExtra = 125;
 let currentMaze: mazeDataType = [];
+const Collisions = new CollisionHandler();
 const coinflip = () => Math.random() >= 0.5; // 50% chance for true or false
 
 const generateRow = (width: number) => {
@@ -42,11 +35,6 @@ const generateRow = (width: number) => {
         }
     }
     return row;
-}
-
-// wip
-const generateColumn = (height: number, refCol: mazeColDataType): mazeColDataType => {
-    return [] as mazeColDataType;
 }
 
 const generateMaze = (width: number, height: number) => {
@@ -141,10 +129,8 @@ canvas.addEventListener("keydown", keyEventHandler("keydown"));
 canvas.addEventListener("keyup", keyEventHandler("keyup"));
 
 const readInputs = () => {
-    const mx = cellCenterOffsetX;
-    const my = cellCenterOffsetY;
     if (pressed_keys["s"]) { // player move down
-        if (currentMaze[my+1][mx][CELL_DATA.TOP]) {
+        if (Collisions.canMoveDown(currentMaze, cellCenterOffsetX, cellCenterOffsetY)) {
             camY -= CELL_SIZE;
             camEffY += CELL_SIZE;
             maze_vshift(1);
@@ -152,7 +138,7 @@ const readInputs = () => {
         delete pressed_keys["s"];
     }
     if (pressed_keys["w"]) { // player move up
-        if (currentMaze[my][mx][CELL_DATA.TOP]) {
+        if (Collisions.canMoveUp(currentMaze, cellCenterOffsetX, cellCenterOffsetY)) {
             camY += CELL_SIZE;
             camEffY -= CELL_SIZE;
             maze_vshift(0);
@@ -160,7 +146,7 @@ const readInputs = () => {
         delete pressed_keys["w"];
     }
     if (pressed_keys["d"]) { // player move right
-        if (currentMaze[my][mx][CELL_DATA.RIGHT]) {
+        if (Collisions.canMoveRight(currentMaze, cellCenterOffsetX, cellCenterOffsetY)) {
             camX -= CELL_SIZE;
             camEffX += CELL_SIZE;
             maze_hshift(1);
@@ -168,7 +154,7 @@ const readInputs = () => {
         delete pressed_keys["d"];
     }
     if (pressed_keys["a"]) { // player move left
-        if (currentMaze[my][mx-1][CELL_DATA.RIGHT]) {
+        if (Collisions.canMoveLeft(currentMaze, cellCenterOffsetX, cellCenterOffsetY)) {
             camX += CELL_SIZE;
             camEffX -= CELL_SIZE;
             maze_hshift(0);
@@ -184,11 +170,15 @@ let camY = 0;
 let camEffX = 0; // values used in lerp for chase anim
 let camEffY = 0;
 
+// Characters
+const characters = new CharactersLoader(CharAnimStep);
+
 // Main game loop
 let lastFrame = Date.now();
 (function animate() {
     const now = Date.now();
     const delta = now - lastFrame;
+    characters.animStep(delta);
     lastFrame = now;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -244,7 +234,8 @@ let lastFrame = Date.now();
             // draw player at center
             ctx.fillStyle = "red";
             const playerSizeReduction = Math.floor(CELL_SIZE * playerScale / 2);
-            ctx.fillRect(
+            ctx.drawImage(
+                characters.pumpkin.base,
                 (cellCenterOffsetX * CELL_SIZE) + (camEffX / playerMoveEff) + playerSizeReduction,
                 (cellCenterOffsetY * CELL_SIZE) + (camEffY / playerMoveEff) + playerSizeReduction,
                 CELL_SIZE - playerSizeReduction * 2, CELL_SIZE - playerSizeReduction * 2
