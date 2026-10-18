@@ -13,10 +13,13 @@ const CharAnimStep = 250;
 const camAnimLerp = 0.01;
 const playerMoveEff = 2;
 const playerScale = 2.15;
+const NPC_count = 5;
+const NPC_spawnTime = 250;
+const NPC_moveSpeedMS = 1000;
 window._isDebugging = false;
 
 // MAZE LOGIC
-const NPCS = new NPCManager(50, 250, 500);
+const NPCS = new NPCManager(NPC_count, NPC_spawnTime, NPC_moveSpeedMS);
 let mazeSizeExtra = 125;
 let currentMaze: mazeDataType = [];
 const Collisions = new CollisionHandler();
@@ -136,6 +139,7 @@ const readInputs = () => {
             camY -= CELL_SIZE;
             camEffY += CELL_SIZE;
             maze_vshift(1);
+            NPCS.posShift(currentMaze, 0, -1);
         }
         delete pressed_keys["s"];
     }
@@ -144,6 +148,7 @@ const readInputs = () => {
             camY += CELL_SIZE;
             camEffY -= CELL_SIZE;
             maze_vshift(0);
+            NPCS.posShift(currentMaze, 0, 1);
         }
         delete pressed_keys["w"];
     }
@@ -152,6 +157,7 @@ const readInputs = () => {
             camX -= CELL_SIZE;
             camEffX += CELL_SIZE;
             maze_hshift(1);
+            NPCS.posShift(currentMaze, -1, 0);
         }
         delete pressed_keys["d"];
     }
@@ -160,6 +166,7 @@ const readInputs = () => {
             camX += CELL_SIZE;
             camEffX -= CELL_SIZE;
             maze_hshift(0);
+            NPCS.posShift(currentMaze, 1, 0);
         }
         delete pressed_keys["a"];
     }

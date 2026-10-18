@@ -84,6 +84,7 @@ export class NPCManager {
                 npc.move(maze);
             }
         }
+        this._oobCheck(maze);
     }
 
     draw(
@@ -106,5 +107,26 @@ export class NPCManager {
     spawn() {
         const newNPC = new NPC(0,0);
         this.currentNPCs.push(newNPC);
+    }
+
+    posShift(maze: mazeDataType, x: number, y: number) {
+        for(let i = 0; i < this.currentNPCs.length; i++) {
+            const npc = this.currentNPCs[i];
+            npc.x += x;
+            npc.y += y;
+        }
+        this._oobCheck(maze);
+    }
+
+    _oobCheck(maze: mazeDataType) {
+        for(let i = 0; i < this.currentNPCs.length; i++) {
+            const npc = this.currentNPCs[i];
+            if (
+                npc.x < 0 || npc.x > maze[0].length-1 ||
+                npc.y < 0 || npc.y > maze.length-1
+            ) {
+                this.currentNPCs.splice(i, 1); 
+            }
+        }
     }
 }
