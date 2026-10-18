@@ -1,9 +1,13 @@
 // Game Config
 const WINDOW_SIZE = 1.15;
-const CELL_SIZE = 50;
+const CELL_SIZE = 75;
+const CELL_WIDTH = 5;
+const GRID_WIDTH = 5;
+const GRID_COLOR = "rgba(255, 255, 255, 0.025)";
 const INPUT_RATE_ms = 100;
 const camAnimLerp = 0.03;
 const playerMoveEff = 2;
+const playerScale = 1.7;
 window._isDebugging = false;
 
 // MAZE LOGIC types
@@ -194,7 +198,8 @@ let lastFrame = Date.now();
 
             // this just draws a semi-transparent matrix
             // might remove later if looks better without it
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.lineWidth = GRID_WIDTH;
+            ctx.strokeStyle = GRID_COLOR;
             ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
 
             // cell coordinates calculations
@@ -209,7 +214,7 @@ let lastFrame = Date.now();
 
                 const mazeCellData = currentMaze[mazeCellY][mazeCellX];
 
-                ctx.lineWidth = 2.5;
+                ctx.lineWidth = CELL_WIDTH;
                 ctx.lineCap = "round";
                 ctx.strokeStyle = "white";
                 ctx.beginPath();
@@ -238,10 +243,11 @@ let lastFrame = Date.now();
 
             // draw player at center
             ctx.fillStyle = "red";
+            const playerSizeReduction = Math.floor(CELL_SIZE * playerScale / 2);
             ctx.fillRect(
-                (cellCenterOffsetX * CELL_SIZE) + (camEffX / playerMoveEff),
-                (cellCenterOffsetY * CELL_SIZE) + (camEffY / playerMoveEff),
-                CELL_SIZE, CELL_SIZE
+                (cellCenterOffsetX * CELL_SIZE) + (camEffX / playerMoveEff) + playerSizeReduction,
+                (cellCenterOffsetY * CELL_SIZE) + (camEffY / playerMoveEff) + playerSizeReduction,
+                CELL_SIZE - playerSizeReduction * 2, CELL_SIZE - playerSizeReduction * 2
             );
 
         }
