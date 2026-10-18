@@ -4,7 +4,7 @@ const CELL_SIZE = 50;
 const INPUT_RATE_ms = 100;
 const camAnimLerp = 0.03;
 const playerMoveEff = 2;
-window._isDebugging = true;
+window._isDebugging = false;
 
 // MAZE LOGIC types
 type intBool = 0 | 1;
@@ -67,13 +67,22 @@ const maze_vshift = (pos: number) => {
     }
 }
 
-// wip
 // maze horizontal shift
 // pos => 1: right, 0: left
 // right -> remove leftmost column, add a column at right
 // left -> remove rightmost column, add a column at left
 const maze_hshift = (pos: number) => {
-    let refCol;
+    const height = currentMaze.length;
+    const generated = generateRow(height);
+    for(let y = 0; y < height; y++) {
+        if (pos) {
+            currentMaze[y].shift();
+            currentMaze[y].push(generated[y]);
+        } else {
+            currentMaze[y].pop();
+            currentMaze[y].unshift(generated[y]);
+        }
+    }
 }
 
 // Canvas setup
@@ -143,11 +152,13 @@ const readInputs = () => {
     if (pressed_keys["d"]) {
         camX -= CELL_SIZE;
         camEffX += CELL_SIZE;
+        maze_hshift(1);
         delete pressed_keys["d"];
     }
     if (pressed_keys["a"]) {
         camX += CELL_SIZE;
         camEffX -= CELL_SIZE;
+        maze_hshift(0);
         delete pressed_keys["a"];
     }
 }
@@ -172,7 +183,7 @@ let lastFrame = Date.now();
 
             // this just draws a semi-transparent matrix
             // might remove later if looks better without it
-            ctx.strokeStyle = "rgba(255,255,255,0.025)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
             ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
 
             // cell coordinates calculations
@@ -188,6 +199,7 @@ let lastFrame = Date.now();
                 const mazeCellData = currentMaze[mazeCellY][mazeCellX];
 
                 ctx.lineWidth = 2.5;
+                ctx.lineCap = "round";
                 ctx.strokeStyle = "white";
                 ctx.beginPath();
 
