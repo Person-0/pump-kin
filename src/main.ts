@@ -2,7 +2,8 @@
 const WINDOW_SIZE   =   1.15;
 const CELL_SIZE     =   50;
 const INPUT_RATE_ms =   100;
-window._isDebugging    =   true;
+const camAnimLerp   =   0.001;
+window._isDebugging =   true;
 
 // MAZE LOGIC
 let mazeSizeExtra = 10;
@@ -134,6 +135,7 @@ const keyEventHandler = (eventName: string) => {
                 if (pressed_keys[key]) delete pressed_keys[key];
                 break;
         }
+        readInputs();
     }
 }
 
@@ -145,19 +147,23 @@ const readInputs = () => {
         camY -= CELL_SIZE;
         camEffY += CELL_SIZE;
         maze_vshift(1);
+        delete pressed_keys["s"];
     }
     if (pressed_keys["w"]) {
         camY += CELL_SIZE;
         camEffY -= CELL_SIZE;
         maze_vshift(0);
+        delete pressed_keys["w"];
     }
     if (pressed_keys["d"]) {
         camX -= CELL_SIZE;
         camEffX += CELL_SIZE;
+        delete pressed_keys["d"];
     }
     if (pressed_keys["a"]) {
         camX += CELL_SIZE;
         camEffX -= CELL_SIZE;
+        delete pressed_keys["a"];
     }
 }
 
@@ -167,20 +173,12 @@ let camY = 0;
 let camEffX = 0; // values used in lerp for chase anim
 let camEffY = 0;
 
-// Player state
-let lastInputTime = 0;
-
 // Main game loop
 let lastFrame = Date.now();
 (function animate() {
     const now = Date.now();
     const delta = now - lastFrame;
     lastFrame = now;
-
-    if (now-lastInputTime >= INPUT_RATE_ms) {
-        readInputs();
-        lastInputTime = now;
-    }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -241,8 +239,8 @@ let lastFrame = Date.now();
         }
     }
 
-    camEffX = lerp(camEffX, 0, 0.0025 * delta);
-    camEffY = lerp(camEffY, 0, 0.0025 * delta);
+    camEffX = lerp(camEffX, 0, camAnimLerp * delta);
+    camEffY = lerp(camEffY, 0, camAnimLerp * delta);
 
     requestAnimationFrame(animate);
 })();
