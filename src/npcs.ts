@@ -23,6 +23,15 @@ class NPC {
         this.moveDir = Math.floor(Math.random()*4);
     }
 
+    _getPossibleMoveDirs(maze: mazeDataType) {
+        let allowedDIRS: number[] = [];
+        if(Collisions.canMoveLeft(maze, this.x, this.y)) allowedDIRS.push(moveDir.LEFT);
+        if(Collisions.canMoveRight(maze, this.x, this.y)) allowedDIRS.push(moveDir.RIGHT);
+        if(Collisions.canMoveUp(maze, this.x, this.y)) allowedDIRS.push(moveDir.TOP);
+        if(Collisions.canMoveDown(maze, this.x, this.y)) allowedDIRS.push(moveDir.BOTTOM);
+        return allowedDIRS;
+    }
+
     move(maze: mazeDataType) {
         let didMove = false;
         switch(this.moveDir) {
@@ -51,14 +60,17 @@ class NPC {
                 }
                 break;
         }
-        if (!didMove) {
-            let allowedDIRS: number[] = [];
-            if(Collisions.canMoveLeft(maze, this.x, this.y)) allowedDIRS.push(moveDir.LEFT);
-            if(Collisions.canMoveRight(maze, this.x, this.y)) allowedDIRS.push(moveDir.RIGHT);
-            if(Collisions.canMoveUp(maze, this.x, this.y)) allowedDIRS.push(moveDir.TOP);
-            if(Collisions.canMoveDown(maze, this.x, this.y)) allowedDIRS.push(moveDir.BOTTOM);
-            this.moveDir = allowedDIRS[Math.floor(Math.random()*allowedDIRS.length)];
-            if (this.instantMove) this.move(maze);
+        if (didMove) {
+            if (Math.random() >= 0.5) { // chance to change dir
+                const allowedDIRS = this._getPossibleMoveDirs(maze);
+                this.moveDir = (allowedDIRS)[Math.floor(Math.random()*allowedDIRS.length)];
+            }
+        } else {
+            const allowedDIRS = this._getPossibleMoveDirs(maze);
+            if (allowedDIRS.length) {
+                this.moveDir = allowedDIRS[Math.floor(Math.random()*allowedDIRS.length)];
+                if (this.instantMove) this.move(maze);
+            }
         }
     }
 }

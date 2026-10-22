@@ -1,11 +1,11 @@
-import CharactersLoader from "./characters";
+import SpritesLoader from "./sprites";
 import { NPCManager } from "./npcs";
 import CollisionHandler from "./collisions";
 import {CELL_DATA, mazeDataType, mazeCellDataType, mazeRowDataType} from "./types";
 
 // Game Config
 const WINDOW_SIZE = 1.15;
-const MAZE_EXTRA = 1;
+const MAZE_EXTRA = 10;
 const CELL_SIZE = 75; // fixed
 const CELL_WIDTH = 5;
 const GRID_WIDTH = 5;
@@ -14,10 +14,10 @@ const CharAnimStep = 250;
 const camAnimLerp = 0.01;
 const playerMoveEff = 2;
 const playerScale = 2.15;
-const NPC_count = 3;
+const NPC_count = 5;
 const NPC_spawnTime = 500;
-const NPC_moveSpeedMS = 600;
-const NPC_instantMove = false;
+const NPC_moveSpeedMS = 1000;
+const NPC_instantMove = true;
 
 window._isDebugging = false;
 
@@ -182,7 +182,7 @@ let camEffX = 0; // values used in lerp for chase anim
 let camEffY = 0;
 
 // Characters
-const characters = new CharactersLoader(CharAnimStep);
+const sprites = new SpritesLoader(CharAnimStep);
 
 // Main game loop
 let lastFrame = Date.now();
@@ -191,19 +191,27 @@ let lastFrame = Date.now();
     const delta = now - lastFrame;
     lastFrame = now;
 
-    characters.animStep(delta);
+    sprites.animStep(delta);
     NPCS.step(currentMaze, delta);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let y = 0; y < canvas.height; y += CELL_SIZE) {
         for (let x = 0; x < canvas.width; x += CELL_SIZE) {
+            // draw floor
+            const offst = 5;
+            ctx.drawImage(sprites.floor.base, x + camEffX - offst, y + camEffY - offst, offst + CELL_SIZE, offst + CELL_SIZE);
+        }
+    }
+
+    for (let y = 0; y < canvas.height; y += CELL_SIZE) {
+        for (let x = 0; x < canvas.width; x += CELL_SIZE) {
 
             // this just draws a semi-transparent matrix
             // might remove later if looks better without it
-            ctx.lineWidth = GRID_WIDTH;
-            ctx.strokeStyle = GRID_COLOR;
-            ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
+            // ctx.lineWidth = GRID_WIDTH;
+            // ctx.strokeStyle = GRID_COLOR;
+            // ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
 
             // cell coordinates calculations
             const cellX = Math.floor(((x - camX) / CELL_SIZE) - cellCenterOffsetX);
@@ -217,22 +225,36 @@ let lastFrame = Date.now();
 
                 const mazeCellData = currentMaze[mazeCellY][mazeCellX];
 
-                ctx.lineWidth = CELL_WIDTH;
-                ctx.lineCap = "round";
-                ctx.strokeStyle = "white";
+                const outlineSize = CELL_WIDTH * 1.5; 
+                const mazeColor = "#532a01";
+                const outlineColor = "#311501";
                 ctx.beginPath();
 
                 // only draw left and top as right and bottom will be auto drawn by next cell
                 if (!mazeCellData[CELL_DATA.TOP]) {
+                    ctx.lineWidth = outlineSize;
+                    ctx.strokeStyle = outlineColor;
+                    ctx.moveTo(x + camEffX - (outlineSize/2), y + camEffY);
+                    ctx.lineTo(x + CELL_SIZE + camEffX + (outlineSize/2), y + camEffY);
+                    ctx.stroke();
+                    ctx.strokeStyle = mazeColor;
+                    ctx.lineWidth = CELL_WIDTH;
                     ctx.moveTo(x + camEffX, y + camEffY);
                     ctx.lineTo(x + CELL_SIZE + camEffX, y + camEffY);
+                    ctx.stroke();
                 }
                 if (!mazeCellData[CELL_DATA.RIGHT]) {
+                    ctx.lineWidth = outlineSize;
+                    ctx.strokeStyle = outlineColor;
+                    ctx.moveTo(x + CELL_SIZE + camEffX, y + camEffY - (outlineSize/2));
+                    ctx.lineTo(x + CELL_SIZE + camEffX, CELL_SIZE + y + camEffY + (outlineSize/2));
+                    ctx.stroke();
+                    ctx.strokeStyle = mazeColor;
+                    ctx.lineWidth = CELL_WIDTH;
                     ctx.moveTo(x + CELL_SIZE + camEffX, y + camEffY);
                     ctx.lineTo(x + CELL_SIZE + camEffX, CELL_SIZE + y + camEffY);
+                    ctx.stroke();
                 }
-
-                ctx.stroke();
             }
 
             if (window._isDebugging) {
@@ -248,14 +270,14 @@ let lastFrame = Date.now();
             ctx.fillStyle = "red";
             const playerSizeReduction = Math.floor(CELL_SIZE * playerScale / 2);
             ctx.drawImage(
-                characters.pumpkin.base,
+                sprites.pumpkin.base,
                 (cellCenterOffsetX * CELL_SIZE) + (camEffX / playerMoveEff) + playerSizeReduction,
                 (cellCenterOffsetY * CELL_SIZE) + (camEffY / playerMoveEff) + playerSizeReduction,
                 CELL_SIZE - playerSizeReduction * 2, CELL_SIZE - playerSizeReduction * 2
             );
 
             // npcs
-            NPCS.draw(ctx, characters.ghost.base, CELL_SIZE, camEffX, camEffY);
+            NPCS.draw(ctx, sprites.ghost.base, CELL_SIZE, camEffX, camEffY);
         }
     }
 

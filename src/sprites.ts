@@ -7,7 +7,7 @@ type texture = {
     load: ()=>void
 }
 
-export default class CharactersLoader {
+export default class SpritesLoader {
 
     animStepMS = 0;
 
@@ -35,10 +35,22 @@ export default class CharactersLoader {
         }
     };
 
+    floor: texture = {
+        name: "floor",
+        type: "normal",
+        frames: [],
+        frameIndex: 0,
+        base: new Image(),
+        load: () => {
+            this.floor.base.src = "/resources/floor.png";
+        }
+    };
+
     constructor(_animStepMS: number) {
         this.animStepMS = _animStepMS;
         this.ghost.load();
         this.pumpkin.load();
+        this.floor.load();
     }
 
     timer = 0;
@@ -46,11 +58,13 @@ export default class CharactersLoader {
         this.timer += delta;
         if (this.timer >= this.animStepMS) {
             this.timer = 0;
+
             this.ghost.frameIndex += 1;
             if (this.ghost.frameIndex >= this.ghost.frames.length) {
                 this.ghost.frameIndex = 0;
             }
             this.ghost.base = this.ghost.frames[this.ghost.frameIndex];
+
         }
     }
 }
