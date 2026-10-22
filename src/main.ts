@@ -4,7 +4,9 @@ import CollisionHandler from "./collisions";
 import {CELL_DATA, mazeDataType, mazeCellDataType, mazeRowDataType} from "./types";
 
 // Game Config
-const WINDOW_SIZE = 1.15;
+const WINDOW_SIZE = 1.1;
+const VIGNETTE_orad = 0.5;
+const VIGNETTE_irad = 0.5;
 const MAZE_EXTRA = 10;
 const CELL_WIDTH = 5;
 const MazeOutlineSize = CELL_WIDTH * 1.5; 
@@ -281,6 +283,17 @@ let lastFrame = Date.now();
 
     camEffX = lerp(camEffX, 0, camAnimLerp * delta);
     camEffY = lerp(camEffY, 0, camAnimLerp * delta);
+
+    // vgrad stuff
+    const vcx = canvas.width / 2;
+    const vcy = canvas.height / 2;
+    const vir = Math.min(canvas.width, canvas.height) * VIGNETTE_irad; 
+    const vor = Math.max(canvas.width, canvas.height) * VIGNETTE_orad;
+    const vgrad = ctx.createRadialGradient(vcx, vcy, vir, vcx, vcy, vor);
+    vgrad.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
+    vgrad.addColorStop(1, 'rgba(0, 0, 0, 0.75)');
+    ctx.fillStyle = vgrad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     requestAnimationFrame(animate);
 })();
