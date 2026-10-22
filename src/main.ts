@@ -6,8 +6,11 @@ import {CELL_DATA, mazeDataType, mazeCellDataType, mazeRowDataType} from "./type
 // Game Config
 const WINDOW_SIZE = 1.15;
 const MAZE_EXTRA = 10;
-const CELL_SIZE = 75; // fixed
 const CELL_WIDTH = 5;
+const MazeOutlineSize = CELL_WIDTH * 1.5; 
+const MazeColor = "#532a01";
+const MazeOutlineColor = "#311501";
+const CELL_SIZE = 75; // fixed
 const GRID_WIDTH = 5;
 const GRID_COLOR = "rgba(254, 158, 61, 0.05)";
 const CharAnimStep = 250;
@@ -172,7 +175,6 @@ const readInputs = () => {
         }
         delete pressed_keys["a"];
     }
-    console.log(camX, camY);
 }
 
 // Camera state
@@ -207,11 +209,12 @@ let lastFrame = Date.now();
     for (let y = 0; y < canvas.height; y += CELL_SIZE) {
         for (let x = 0; x < canvas.width; x += CELL_SIZE) {
 
-            // this just draws a semi-transparent matrix
-            // might remove later if looks better without it
-            // ctx.lineWidth = GRID_WIDTH;
-            // ctx.strokeStyle = GRID_COLOR;
-            // ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
+            if (window._isDebugging) {
+                // this just draws a semi-transparent matrix
+                ctx.lineWidth = GRID_WIDTH;
+                ctx.strokeStyle = GRID_COLOR;
+                ctx.strokeRect(x + camEffX, y + camEffY, CELL_SIZE, CELL_SIZE);
+            }
 
             // cell coordinates calculations
             const cellX = Math.floor(((x - camX) / CELL_SIZE) - cellCenterOffsetX);
@@ -224,32 +227,28 @@ let lastFrame = Date.now();
             if (currentMaze[mazeCellY]) {
 
                 const mazeCellData = currentMaze[mazeCellY][mazeCellX];
-
-                const outlineSize = CELL_WIDTH * 1.5; 
-                const mazeColor = "#532a01";
-                const outlineColor = "#311501";
                 ctx.beginPath();
 
                 // only draw left and top as right and bottom will be auto drawn by next cell
                 if (!mazeCellData[CELL_DATA.TOP]) {
-                    ctx.lineWidth = outlineSize;
-                    ctx.strokeStyle = outlineColor;
-                    ctx.moveTo(x + camEffX - (outlineSize/2), y + camEffY);
-                    ctx.lineTo(x + CELL_SIZE + camEffX + (outlineSize/2), y + camEffY);
+                    ctx.lineWidth = MazeOutlineSize;
+                    ctx.strokeStyle = MazeOutlineColor;
+                    ctx.moveTo(x + camEffX - (MazeOutlineSize/2), y + camEffY);
+                    ctx.lineTo(x + CELL_SIZE + camEffX + (MazeOutlineSize/2), y + camEffY);
                     ctx.stroke();
-                    ctx.strokeStyle = mazeColor;
+                    ctx.strokeStyle = MazeColor;
                     ctx.lineWidth = CELL_WIDTH;
                     ctx.moveTo(x + camEffX, y + camEffY);
                     ctx.lineTo(x + CELL_SIZE + camEffX, y + camEffY);
                     ctx.stroke();
                 }
                 if (!mazeCellData[CELL_DATA.RIGHT]) {
-                    ctx.lineWidth = outlineSize;
-                    ctx.strokeStyle = outlineColor;
-                    ctx.moveTo(x + CELL_SIZE + camEffX, y + camEffY - (outlineSize/2));
-                    ctx.lineTo(x + CELL_SIZE + camEffX, CELL_SIZE + y + camEffY + (outlineSize/2));
+                    ctx.lineWidth = MazeOutlineSize;
+                    ctx.strokeStyle = MazeOutlineColor;
+                    ctx.moveTo(x + CELL_SIZE + camEffX, y + camEffY - (MazeOutlineSize/2));
+                    ctx.lineTo(x + CELL_SIZE + camEffX, CELL_SIZE + y + camEffY + (MazeOutlineSize/2));
                     ctx.stroke();
-                    ctx.strokeStyle = mazeColor;
+                    ctx.strokeStyle = MazeColor;
                     ctx.lineWidth = CELL_WIDTH;
                     ctx.moveTo(x + CELL_SIZE + camEffX, y + camEffY);
                     ctx.lineTo(x + CELL_SIZE + camEffX, CELL_SIZE + y + camEffY);
@@ -267,7 +266,6 @@ let lastFrame = Date.now();
             }
 
             // draw player at center
-            ctx.fillStyle = "red";
             const playerSizeReduction = Math.floor(CELL_SIZE * playerScale / 2);
             ctx.drawImage(
                 sprites.pumpkin.base,
