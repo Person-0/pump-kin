@@ -15,6 +15,8 @@ The player needs to avoid the ghosts while exploring the maze.<br>
 - The AIM while making this game was to learn about infinite procedurally generated mazes, and not to actually create a good looking game (which is the reason the game looks so basic)
 - I initially used the [Eller's algorithm](https://weblog.jamisbuck.org/2010/12/29/maze-generation-eller-s-algorithm) but that just didn't work so moved onto [Sidewinder algorithm](https://weblog.jamisbuck.org/2011/2/3/maze-generation-sidewinder-algorithm).
 
+> Note that this game is made exclusively for PCs and not phones, the site will not work in vertical screen sizes and there is no way to send player inputs on phone without a keyboard either.
+
 ## Tools and tech used
 - The game was made in Vanilla HTML/CSS and JS
 - The dev environment uses [Vite](https://vite.dev/) with [TypeScript](https://www.typescriptlang.org/) to speed up the development and help with issues faced when using vanilla JS.
