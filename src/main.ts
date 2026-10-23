@@ -6,6 +6,7 @@ import {CELL_DATA, mazeDataType, mazeCellDataType, mazeRowDataType} from "./type
 // Game Config
 const GAME_LIVES = 3;
 const INVINCIBLE_TIME_MS = 2500;
+const INVINCIBLE_BLINKS_MS = 150;
 const WINDOW_SIZE = 1.1;
 const VIGNETTE_orad = 0.5;
 const VIGNETTE_irad = 0.5;
@@ -31,6 +32,8 @@ window._isDebugging = false;
 // game state
 let lives = GAME_LIVES;
 let invincibleState = 0;
+let showPlayer = true;
+let showHearts = true;
 
 // setup
 const canvas = document.getElementById("game")      as HTMLCanvasElement;
@@ -278,19 +281,29 @@ function animate() {
     }
 
     // draw player at center
-    const playerSizeReduction = Math.floor(CELL_SIZE * playerScale / 2);
-    ctx.drawImage(
-        sprites.pumpkin.base,
-        (cellCenterOffsetX * CELL_SIZE) + (camEffX / playerMoveEff) + playerSizeReduction,
-        (cellCenterOffsetY * CELL_SIZE) + (camEffY / playerMoveEff) + playerSizeReduction,
-        CELL_SIZE - playerSizeReduction * 2, CELL_SIZE - playerSizeReduction * 2
-    );
+    if (invincibleState > 0) {
+        invincibleState -= delta;
+        if (invincibleState <= 0) invincibleState = 0;
+    } 
+    if (showPlayer) {
+        const playerSizeReduction = Math.floor(CELL_SIZE * playerScale / 2);
+        ctx.drawImage(
+            sprites.pumpkin.base,
+            (cellCenterOffsetX * CELL_SIZE) + (camEffX / playerMoveEff) + playerSizeReduction,
+            (cellCenterOffsetY * CELL_SIZE) + (camEffY / playerMoveEff) + playerSizeReduction,
+            CELL_SIZE - playerSizeReduction * 2, CELL_SIZE - playerSizeReduction * 2
+        );
+    }
 
     // npcs
     NPCS.draw(ctx, sprites.ghost.base, CELL_SIZE, camEffX, camEffY);
     for(const npc of NPCS.currentNPCs) {
-        if(!invincibleState && npc.x === cellCenterOffsetX && npc.y === cellCenterOffsetY) {
+        if((invincibleState <= 0) && npc.x === cellCenterOffsetX && npc.y === cellCenterOffsetY) {
             invincibleState = INVINCIBLE_TIME_MS;
+            blink(INVINCIBLE_TIME_MS / INVINCIBLE_BLINKS_MS, INVINCIBLE_BLINKS_MS, (e)=>{
+                showPlayer=e;
+                showHearts=e;
+            });
             lives -= 1;
             if (lives <= 0) {
                 alert("gameover");
@@ -313,10 +326,12 @@ function animate() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // draw hearts
-    const heartDrawSize = CELL_SIZE/3;
-    const heartDrawSpacing = CELL_SIZE/2;
-    for(let x = heartDrawSize; x < lives*heartDrawSpacing; x+=heartDrawSpacing) {
-        ctx.drawImage(sprites.heart.base, x, heartDrawSize, heartDrawSize, heartDrawSize);
+    if (showHearts) {
+        const heartDrawSize = CELL_SIZE/3;
+        const heartDrawSpacing = CELL_SIZE/2;
+        for(let x = heartDrawSize; x < lives*heartDrawSpacing; x+=heartDrawSpacing) {
+            ctx.drawImage(sprites.heart.base, x, heartDrawSize, heartDrawSize, heartDrawSize);
+        }
     }
 
     requestAnimationFrame(animate);
@@ -325,4 +340,18 @@ function animate() {
 // Utils
 function lerp(a: number, b: number, t: number) {
     return a + (b - a) * t;
+}
+
+function blink(times: number, interval: number, valueSetter:(value: boolean)=>void) {
+    let val = true;
+    let done = times;
+    let intervalFn = setInterval(() => {
+        if (done <= 0) {
+            valueSetter(true);
+            return clearInterval(intervalFn);
+        }
+        valueSetter(val);
+        val = !val;
+        done -= 1;
+    }, interval);
 }
