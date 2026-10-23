@@ -4,6 +4,7 @@ import CollisionHandler from "./collisions";
 import {CELL_DATA, mazeDataType, mazeCellDataType, mazeRowDataType} from "./types";
 
 // Game Config
+const GAME_LIVES = 3;
 const WINDOW_SIZE = 1.1;
 const VIGNETTE_orad = 0.5;
 const VIGNETTE_irad = 0.5;
@@ -19,12 +20,15 @@ const CharAnimStep = 250;
 const camAnimLerp = 0.01;
 const playerMoveEff = 2;
 const playerScale = 2.15;
-const NPC_count = 5;
+const NPC_count = 10;
 const NPC_spawnTime = 500;
 const NPC_moveSpeedMS = 1000;
 const NPC_instantMove = true;
 
 window._isDebugging = false;
+
+// game state
+let lives = GAME_LIVES;
 
 // setup
 const canvas = document.getElementById("game")      as HTMLCanvasElement;
@@ -296,6 +300,13 @@ function animate() {
     vgrad.addColorStop(1, 'rgba(0, 0, 0, 0.75)');
     ctx.fillStyle = vgrad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // draw hearts
+    const heartDrawSize = CELL_SIZE/3;
+    const heartDrawSpacing = CELL_SIZE/2;
+    for(let x = heartDrawSize; x < lives*heartDrawSpacing; x+=heartDrawSpacing) {
+        ctx.drawImage(sprites.heart.base, x, heartDrawSize, heartDrawSize, heartDrawSize);
+    }
 
     requestAnimationFrame(animate);
 };

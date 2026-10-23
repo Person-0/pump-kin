@@ -32,6 +32,9 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(255, 120, 31, 0.87);
+    background-image: url(../resources/pumpkin.png);
+    background-repeat: repeat;
+    background-blend-mode: difference;
 }
 
 #title {
@@ -75,7 +78,7 @@ body {
     margin: auto;
     padding: 5vw;
     border-radius: 1vw;
-    background: #913b036e;
+    background: #913b03d1;
     line-height: 40px;
     box-shadow: 2px 2px 5px #000000;
 }

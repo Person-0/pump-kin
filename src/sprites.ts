@@ -46,11 +46,23 @@ export default class SpritesLoader {
         }
     };
 
+    heart: texture = {
+        name: "heart",
+        type: "normal",
+        frames: [],
+        frameIndex: 0,
+        base: new Image(),
+        load: () => {
+            this.heart.base.src = "/resources/heart.png";
+        }
+    };
+
     constructor(_animStepMS: number) {
         this.animStepMS = _animStepMS;
         this.ghost.load();
         this.pumpkin.load();
         this.floor.load();
+        this.heart.load();
     }
 
     timer = 0;
