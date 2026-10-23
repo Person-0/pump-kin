@@ -22,7 +22,7 @@ The player needs to avoid the ghosts while exploring the maze.<br>
 
 ## How to play?
 
-- Open the demo link ([click here](https://person-0.github.io/pump-kin/))
+- Open the demo link ([click here](https://pumpkin-lime.vercel.app/))
 - Click the play button
 - Use WASD keys to move around in the maze.
 - You have 3 lives, avoid the ghosts. Every collision into a ghost costs one life and makes you invincible for 2.5s so you can reposition yourself.
