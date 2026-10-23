@@ -26,6 +26,16 @@ const NPC_instantMove = true;
 
 window._isDebugging = false;
 
+// setup
+const canvas = document.getElementById("game")      as HTMLCanvasElement;
+const ctx = canvas.getContext("2d")                 as CanvasRenderingContext2D;
+const startBtn = document.getElementById("play")    as HTMLElement;
+startBtn.onclick = () => {
+    document.getElementById("uiContainer")?.remove();
+    canvas.style.display = "block";
+    animate();
+};
+
 // MAZE LOGIC
 const NPCS = new NPCManager(NPC_count, NPC_spawnTime, NPC_moveSpeedMS, NPC_instantMove);
 let currentMaze: mazeDataType = [];
@@ -87,14 +97,6 @@ const maze_hshift = (pos: number) => {
             currentMaze[y].unshift(generated[y]);
         }
     }
-}
-
-// Canvas setup
-const canvas = document.getElementById("game") as HTMLCanvasElement;
-const ctx = canvas.getContext("2d");
-if (!ctx) {
-    alert("canvas rendering context could not be created!");
-    throw "ctx err";
 }
 
 let cellCenterOffsetX = 0;
@@ -190,7 +192,7 @@ const sprites = new SpritesLoader(CharAnimStep);
 
 // Main game loop
 let lastFrame = Date.now();
-(function animate() {
+function animate() {
     const now = Date.now();
     const delta = now - lastFrame;
     lastFrame = now;
@@ -296,7 +298,7 @@ let lastFrame = Date.now();
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     requestAnimationFrame(animate);
-})();
+};
 
 // Utils
 function lerp(a: number, b: number, t: number) {
