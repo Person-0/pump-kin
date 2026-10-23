@@ -109,12 +109,12 @@ body {
 }
 
 .text-game-over {
-    width: 70%;
-    text-align: center;
-    font-size: 5rem;
-    text-shadow: 5px 5px 5px #7a0000;
-    font-weight: bolder;
-    color: red;
+    width: 70%!important;
+    text-align: center!important;
+    font-size: 5rem!important;
+    text-shadow: 5px 5px 5px #7a0000!important;
+    font-weight: bolder!important;
+    color: red!important;
 }
 
 #replay {
