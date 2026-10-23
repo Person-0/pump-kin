@@ -7,7 +7,18 @@
     <link rel="stylesheet" href="./assets/main.css">
 </head>
 <body>
-    <canvas id="game" tabindex="1"></canvas>
+    <div id="uiContainer">
+        <div id="title">Pump-kin<p id="betaText">(beta)</p></div>
+        <div id="instructions">
+            <div id="instructions-text">
+                1. You are a pumpkin, roaming an endless maze. <br>
+                2. Avoid ghosts and stay alive as long as you can. <br>
+                3. That is it, more will come soon!
+            </div>
+            <button id="play">Play</button>
+        </div>
+    </div>
+    <canvas id="_game" tabindex="1"></canvas>
     <script type="module" src="./src/main.ts"></script>
 </body>
 </html>

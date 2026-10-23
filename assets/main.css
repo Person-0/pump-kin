@@ -1,5 +1,6 @@
 * {
     margin: 0;
+    font-family: monospace;
 }
 
 body {
@@ -10,6 +11,7 @@ body {
     background-color: black;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 #game {
@@ -21,4 +23,83 @@ body {
     margin: auto;
     user-select: none;
     outline: none;
+}
+
+#uiContainer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 120, 31, 0.87);
+}
+
+#title {
+    font-size: 10rem;
+    color: white;
+    text-align: center;
+    width: 100%;
+    height: 25%;
+    padding-bottom: 2vh;
+    font-weight: bolder;
+    background-color: black;
+    text-shadow: 5px 5px 0px #ff7a00;
+    -webkit-text-stroke: 2px black;
+    border-bottom: 4px solid #0d850e;
+}
+
+#betaText {
+    font-size: 2.5vw;
+    text-shadow: none;
+    -webkit-text-stroke: 0;
+    color: #ffffff;
+    transform: translate(19vw, -2vh);
+}
+
+#instructions {
+    width: 100%;
+    background: transparent;
+    height: fit-content;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+#instructions-text {
+    font-size: 1.9rem;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    width: fit-content;
+    height: auto;
+    margin: auto;
+    padding: 5vw;
+    border-radius: 1vw;
+    background: #913b036e;
+    line-height: 40px;
+    box-shadow: 2px 2px 5px #000000;
+}
+
+#play {
+    font-size: 2rem;
+    padding: 1vw;
+    padding-left: 5vw;
+    padding-right: 5vw;
+    background: #2de72db0;
+    border-radius: 1rem;
+    border: none;
+    color: #000000;
+    left: 0;
+    right: 0;
+    position: absolute;
+    width: fit-content;
+    margin: auto;
+    margin-top: 2rem;
+    box-shadow: 2px 2px 5px black;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+#play:hover {
+    color: white;
+    background: black;
 }
