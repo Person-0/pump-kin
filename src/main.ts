@@ -34,13 +34,14 @@ let lives = GAME_LIVES;
 let invincibleState = 0;
 let showPlayer = true;
 let showHearts = true;
+let gameRunning = true;
 
 // setup
 const canvas = document.getElementById("game")      as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")                 as CanvasRenderingContext2D;
 const startBtn = document.getElementById("play")    as HTMLElement;
 startBtn.onclick = () => {
-    document.getElementById("uiContainer")?.remove();
+    document.getElementById("uiContainer-init")?.remove();
     canvas.style.display = "block";
     animate();
 };
@@ -126,6 +127,13 @@ const onResize = () => {
 onResize();
 window.onresize = onResize;
 
+// game end stuff
+function gameEnd() {
+    gameRunning = false;
+    canvas.remove();
+    (document.getElementById("uiContainer-end") as HTMLElement).style.display = "block";
+}
+
 // Inputs
 const pressed_keys: Record<string, number> = {};
 
@@ -202,6 +210,8 @@ const sprites = new SpritesLoader(CharAnimStep);
 // Main game loop
 let lastFrame = Date.now();
 function animate() {
+    if (!gameRunning) return;
+
     const now = Date.now();
     const delta = now - lastFrame;
     lastFrame = now;
@@ -306,7 +316,7 @@ function animate() {
             });
             lives -= 1;
             if (lives <= 0) {
-                alert("gameover");
+                gameEnd();
             }
         }
     }

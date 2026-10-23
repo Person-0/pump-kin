@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./assets/main.css">
 </head>
 <body>
-    <div id="uiContainer">
+    <div id="uiContainer-init">
         <div id="title">Pump-kin<p id="betaText">(beta)</p></div>
         <div id="instructions">
             <div id="instructions-text">
@@ -16,6 +16,14 @@
                 3. That is it, more will come soon!
             </div>
             <button id="play">Play</button>
+        </div>
+    </div>
+    <div id="uiContainer-end" style="display:none">
+        <div id="instructions">
+            <div id="instructions-text" class="text-game-over">
+                GAME OVER!
+            </div>
+            <button id="replay" onclick="window.location.reload()">Replay</button>
         </div>
     </div>
     <canvas style="display:none" id="game" tabindex="1"></canvas>
