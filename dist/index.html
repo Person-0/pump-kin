@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MazePumpkin</title>
+  <script type="module" crossorigin src="/assets/index-BqxXCjBV.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-6aE03Lj5.css">
+</head>
+<body>
+    <div id="uiContainer-init">
+        <div id="title">Pump-kin<p id="betaText">(beta)</p></div>
+        <div id="instructions">
+            <div id="instructions-text">
+                1. You are a pumpkin, roaming an endless maze. <br>
+                2. Avoid ghosts and stay alive as long as you can. <br>
+                3. That is it, more will come soon!
+            </div>
+            <button id="play">Play</button>
+        </div>
+    </div>
+    <div id="uiContainer-end" style="display:none">
+        <div id="instructions">
+            <div id="instructions-text" class="text-game-over">
+                GAME OVER!
+            </div>
+            <button id="replay" onclick="window.location.reload()">Replay</button>
+        </div>
+    </div>
+    <canvas style="display:none" id="game" tabindex="1"></canvas>
+</body>
+</html>
