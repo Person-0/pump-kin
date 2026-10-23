@@ -5,6 +5,7 @@ import {CELL_DATA, mazeDataType, mazeCellDataType, mazeRowDataType} from "./type
 
 // Game Config
 const GAME_LIVES = 3;
+const INVINCIBLE_TIME_MS = 2500;
 const WINDOW_SIZE = 1.1;
 const VIGNETTE_orad = 0.5;
 const VIGNETTE_irad = 0.5;
@@ -29,6 +30,7 @@ window._isDebugging = false;
 
 // game state
 let lives = GAME_LIVES;
+let invincibleState = 0;
 
 // setup
 const canvas = document.getElementById("game")      as HTMLCanvasElement;
@@ -272,18 +274,27 @@ function animate() {
                 ctx.fillStyle = "lime";
                 ctx.fillText(cellY.toString(), x + camEffX + 20, y + camEffY + 40);
             }
+        }
+    }
 
-            // draw player at center
-            const playerSizeReduction = Math.floor(CELL_SIZE * playerScale / 2);
-            ctx.drawImage(
-                sprites.pumpkin.base,
-                (cellCenterOffsetX * CELL_SIZE) + (camEffX / playerMoveEff) + playerSizeReduction,
-                (cellCenterOffsetY * CELL_SIZE) + (camEffY / playerMoveEff) + playerSizeReduction,
-                CELL_SIZE - playerSizeReduction * 2, CELL_SIZE - playerSizeReduction * 2
-            );
+    // draw player at center
+    const playerSizeReduction = Math.floor(CELL_SIZE * playerScale / 2);
+    ctx.drawImage(
+        sprites.pumpkin.base,
+        (cellCenterOffsetX * CELL_SIZE) + (camEffX / playerMoveEff) + playerSizeReduction,
+        (cellCenterOffsetY * CELL_SIZE) + (camEffY / playerMoveEff) + playerSizeReduction,
+        CELL_SIZE - playerSizeReduction * 2, CELL_SIZE - playerSizeReduction * 2
+    );
 
-            // npcs
-            NPCS.draw(ctx, sprites.ghost.base, CELL_SIZE, camEffX, camEffY);
+    // npcs
+    NPCS.draw(ctx, sprites.ghost.base, CELL_SIZE, camEffX, camEffY);
+    for(const npc of NPCS.currentNPCs) {
+        if(!invincibleState && npc.x === cellCenterOffsetX && npc.y === cellCenterOffsetY) {
+            invincibleState = INVINCIBLE_TIME_MS;
+            lives -= 1;
+            if (lives <= 0) {
+                alert("gameover");
+            }
         }
     }
 
